@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geomancy</title>
+    <title>ジオマンシー・ワンオラクル</title>
     <meta name="description" content="シンプルなジオマンシー占いアプリ - ワンオラクルでメッセージを受け取ろう">
     <meta name="theme-color" content="#2c3e50">
     
@@ -23,6 +23,8 @@
             min-height: 100vh;
             color: #5d4e37;
             overflow-x: hidden;
+            margin: 0;
+            padding: 0;
         }
 
         .container {
@@ -207,7 +209,7 @@
         .dot-zones {
             display: flex;
             flex-direction: column;
-            width: 100vw;
+            width: 100%;
             margin: 0;
             border: none;
             border-radius: 0;
@@ -413,8 +415,8 @@
 
         <!-- ドットオラクル画面 -->
         <div id="dot-oracle-screen" class="screen">
-            <div style="padding: 16px 20px 8px 20px;">
-                <button class="back-button" onclick="showHome()">← 戻る</button>
+            <div style="padding: 16px 0 8px 0;">
+                <button class="back-button" style="margin-left: 20px;" onclick="showHome()">← 戻る</button>
             </div>
             
             <div class="dot-zones">
@@ -470,16 +472,6 @@
                     4つのダイスの結果からシンボルが生成されます
                 </p>
             </div>
-        </div>
-    </div>
-
-    <!-- シンボルダイアログ -->
-    <div id="symbol-dialog" class="symbol-dialog">
-        <div class="symbol-content">
-            <div class="symbol-figure" id="symbol-figure"></div>
-            <div class="symbol-name" id="symbol-name"></div>
-            <div class="symbol-meaning" id="symbol-meaning"></div>
-            <button class="dialog-close-btn" onclick="closeSymbolDialog()">閉じる</button>
         </div>
     </div>
 
