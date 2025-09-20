@@ -319,6 +319,17 @@
             box-shadow: 0 4px 15px rgba(139,115,85,0.3);
         }
 
+        .roll-button:disabled {
+            background: rgba(139,115,85,0.3);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Three.js用のスタイル */
+        #dice-canvas {
+            border-radius: 12px;
+        }
+
         @media (max-width: 480px) {
             .container {
                 padding: 16px;
@@ -513,23 +524,21 @@
 
         <!-- ダイスオラクル画面 -->
         <div id="dice-oracle-screen" class="screen">
-            <button class="back-button" onclick="showHome()">← 戻る</button>
+            <div style="padding: 16px 0 8px 0;">
+                <button class="back-button" style="margin-left: 20px;" onclick="showHome()">← 戻る</button>
+            </div>
             
-            <div class="oracle-screen">
-                <h2 class="oracle-title">ダイス占い</h2>
-                
-                <div class="dice-container">
-                    <div class="dice" id="dice1">?</div>
-                    <div class="dice" id="dice2">?</div>
-                    <div class="dice" id="dice3">?</div>
-                    <div class="dice" id="dice4">?</div>
+            <div style="flex: 1; display: flex; flex-direction: column;">
+                <div id="dice-container" style="flex: 1; min-height: 400px; position: relative; background: rgba(255,255,255,0.3); margin: 0 20px; border-radius: 12px;">
+                    <!-- Three.jsキャンバスがここに挿入されます -->
                 </div>
                 
-                <button class="roll-button" onclick="rollAllDice()">ダイスを振る</button>
-                
-                <p class="info-text" style="color: rgba(93,78,55,0.7); font-size: 14px; margin-top: 20px;">
-                    4つのダイスの結果からシンボルが生成されます
-                </p>
+                <div style="padding: 16px 20px 20px 20px; text-align: center;">
+                    <p style="color: rgba(93,78,55,0.7); font-size: 14px; margin-bottom: 16px; line-height: 1.4;">
+                        4つのダイス（火・風・水・地）を振って、各要素の偶数・奇数の組み合わせからジオマンシーのシンボルが決まります。
+                    </p>
+                    <button class="roll-button" id="dice-roll-btn" onclick="rollPhysicalDice()">ダイスを振る</button>
+                </div>
             </div>
         </div>
     </div>
@@ -560,6 +569,10 @@
         </div>
     </div>
 
+    <!-- Three.js と Cannon.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/1.15.1/cannon.min.js"></script>
+
     <script>
         // PWA用のサービスワーカー登録
         if ('serviceWorker' in navigator) {
@@ -573,6 +586,21 @@
         // ドット占い用の変数
         let zoneDots = [[], [], [], []]; // 4つの領域のドット座標
         let isGenerating = false; // 生成中フラグ
+
+        // 3Dダイス用の変数
+        let scene, camera, renderer, world;
+        let dicePhysics = [];
+        let diceVisual = [];
+        let isRolling = false;
+        let diceResults = [null, null, null, null];
+
+        // ダイスの色（火・風・水・地）
+        const diceColors = [
+            0xff4444, // 火（赤）
+            0xffff44, // 風（黄）
+            0x4444ff, // 水（青）
+            0x44ff44  // 地（緑）
+        ];
 
         // ジオマンシーのシンボル定義（16種類）
         const geomancySymbols = {
@@ -603,7 +631,9 @@
         function showDiceOracle() {
             hideAllScreens();
             document.getElementById('dice-oracle-screen').classList.add('active');
-            resetDiceOracle();
+            setTimeout(() => {
+                initDiceScene();
+            }, 100);
         }
 
         function showHome() {
@@ -813,45 +843,296 @@
         }
 
         function resetDiceOracle() {
-            const dices = document.querySelectorAll('.dice');
-            dices.forEach(dice => {
-                dice.textContent = '?';
-                dice.classList.remove('rolling');
+            diceResults = [null, null, null, null];
+            isRolling = false;
+            const rollBtn = document.getElementById('dice-roll-btn');
+            if (rollBtn) {
+                rollBtn.disabled = false;
+                rollBtn.textContent = 'ダイスを振る';
+            }
+        }
+
+        function initDiceScene() {
+            const container = document.getElementById('dice-container');
+            if (!container || container.querySelector('canvas')) return;
+
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // Three.js シーン設定
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf5f0e8);
+
+            // カメラ（上から見下ろす視点）
+            camera = new THREE.OrthographicCamera(
+                width / -100, width / 100,
+                height / 100, height / -100,
+                0.1, 1000
+            );
+            camera.position.set(0, 10, 0);
+            camera.lookAt(0, 0, 0);
+
+            // レンダラー
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(width, height);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.domElement.id = 'dice-canvas';
+            container.appendChild(renderer.domElement);
+
+            // ライト
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 20, 5);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            scene.add(directionalLight);
+
+            // 物理エンジン
+            world = new CANNON.World();
+            world.gravity.set(0, -30, 0);
+            world.broadphase = new CANNON.NaiveBroadphase();
+
+            // 床
+            const floorShape = new CANNON.Plane();
+            const floorBody = new CANNON.Body({ mass: 0 });
+            floorBody.addShape(floorShape);
+            floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+            world.add(floorBody);
+
+            // 床の視覚的表現
+            const floorGeometry = new THREE.PlaneGeometry(20, 20);
+            const floorMaterial = new THREE.MeshLambertMaterial({ color: 0xe8dcc6, transparent: true, opacity: 0.8 });
+            const floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
+            floorMesh.rotation.x = -Math.PI / 2;
+            floorMesh.receiveShadow = true;
+            scene.add(floorMesh);
+
+            // 壁（ダイスが外に出ないように）
+            createWalls();
+
+            // アニメーションループ
+            animate();
+        }
+
+        function createWalls() {
+            const wallDistance = 8;
+            const wallHeight = 5;
+            
+            // 4つの壁を作成
+            const walls = [
+                { pos: [wallDistance, wallHeight/2, 0], rot: [0, 0, 0] }, // 右
+                { pos: [-wallDistance, wallHeight/2, 0], rot: [0, 0, 0] }, // 左
+                { pos: [0, wallHeight/2, wallDistance], rot: [0, 0, 0] }, // 奥
+                { pos: [0, wallHeight/2, -wallDistance], rot: [0, 0, 0] } // 手前
+            ];
+
+            walls.forEach(wall => {
+                const wallShape = new CANNON.Box(new CANNON.Vec3(0.5, wallHeight/2, wallDistance));
+                const wallBody = new CANNON.Body({ mass: 0 });
+                wallBody.addShape(wallShape);
+                wallBody.position.set(...wall.pos);
+                world.add(wallBody);
             });
         }
 
-        function rollAllDice() {
-            const dices = document.querySelectorAll('.dice');
-            
-            // アニメーション開始
-            dices.forEach(dice => {
-                dice.classList.add('rolling');
-            });
-            
-            // 1秒後にダイスの結果を表示
-            setTimeout(() => {
-                dices.forEach((dice, index) => {
-                    dice.classList.remove('rolling');
-                    const result = Math.floor(Math.random() * 6) + 1;
-                    dice.textContent = result;
-                });
+        function createDice() {
+            // 既存のダイスをクリア
+            dicePhysics.forEach(dice => world.remove(dice));
+            diceVisual.forEach(dice => scene.remove(dice));
+            dicePhysics = [];
+            diceVisual = [];
+
+            for (let i = 0; i < 4; i++) {
+                // 物理ダイス
+                const diceShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5));
+                const diceBody = new CANNON.Body({ mass: 1 });
+                diceBody.addShape(diceShape);
                 
-                // ここで4つのダイスの結果からジオマンシーシンボルを生成
-                generateSymbolFromDice();
-            }, 1000);
+                // 初期位置（少しずつずらして配置）
+                diceBody.position.set(
+                    (Math.random() - 0.5) * 4,
+                    5 + i * 0.5,
+                    (Math.random() - 0.5) * 4
+                );
+                
+                // 初期回転と速度
+                diceBody.quaternion.set(
+                    Math.random(), Math.random(), Math.random(), Math.random()
+                ).normalize();
+                
+                diceBody.velocity.set(
+                    (Math.random() - 0.5) * 10,
+                    Math.random() * 5,
+                    (Math.random() - 0.5) * 10
+                );
+                
+                diceBody.angularVelocity.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20
+                );
+
+                // ダイス同士の跳ね返り係数を大きく
+                diceBody.material = new CANNON.Material();
+                diceBody.material.restitution = 0.9;
+                diceBody.material.friction = 0.3;
+
+                world.add(diceBody);
+                dicePhysics.push(diceBody);
+
+                // 視覚的ダイス
+                const diceGeometry = new THREE.BoxGeometry(1, 1, 1);
+                const diceMaterial = new THREE.MeshLambertMaterial({ color: diceColors[i] });
+                const diceMesh = new THREE.Mesh(diceGeometry, diceMaterial);
+                diceMesh.castShadow = true;
+                diceMesh.receiveShadow = true;
+                scene.add(diceMesh);
+                diceVisual.push(diceMesh);
+            }
+
+            // ダイス同士の跳ね返り設定
+            for (let i = 0; i < dicePhysics.length; i++) {
+                for (let j = i + 1; j < dicePhysics.length; j++) {
+                    const contactMaterial = new CANNON.ContactMaterial(
+                        dicePhysics[i].material,
+                        dicePhysics[j].material,
+                        {
+                            friction: 0.3,
+                            restitution: 0.95 // 非常に大きな跳ね返り
+                        }
+                    );
+                    world.addContactMaterial(contactMaterial);
+                }
+            }
         }
 
-        function generateSymbolFromDice() {
-            const dices = document.querySelectorAll('.dice');
-            const results = Array.from(dices).map(dice => parseInt(dice.textContent));
+        function rollPhysicalDice() {
+            if (isRolling) return;
             
-            // 仮のシンボル生成ロジック（偶数なら••、奇数なら•）
-            const symbol = results.map(result => result % 2 === 0 ? '••' : '•');
+            isRolling = true;
+            diceResults = [null, null, null, null];
             
-            // 結果表示（仮）
+            const rollBtn = document.getElementById('dice-roll-btn');
+            rollBtn.disabled = true;
+            rollBtn.textContent = '振っています...';
+
+            createDice();
+
+            // 3秒後にダイスが止まったかチェック開始
             setTimeout(() => {
-                alert('シンボル生成完了！\n' + symbol.join('\n'));
-            }, 500);
+                checkDiceSettled();
+            }, 3000);
+        }
+
+        function checkDiceSettled() {
+            let allSettled = true;
+            
+            for (let i = 0; i < dicePhysics.length; i++) {
+                const dice = dicePhysics[i];
+                const velocity = dice.velocity.length();
+                const angularVel = dice.angularVelocity.length();
+                
+                if (velocity > 0.1 || angularVel > 0.1) {
+                    allSettled = false;
+                    break;
+                }
+            }
+
+            if (allSettled) {
+                // ダイスの目を判定
+                for (let i = 0; i < dicePhysics.length; i++) {
+                    diceResults[i] = getDiceValue(dicePhysics[i]);
+                }
+                
+                setTimeout(() => {
+                    showDiceResults();
+                }, 500);
+            } else {
+                // まだ動いている場合は再チェック
+                setTimeout(() => {
+                    checkDiceSettled();
+                }, 200);
+            }
+        }
+
+        function getDiceValue(diceBody) {
+            // 簡単な方法：Y軸の向きから上面を判定
+            const up = new CANNON.Vec3(0, 1, 0);
+            const faces = [
+                new CANNON.Vec3(0, 1, 0),  // 上面
+                new CANNON.Vec3(0, -1, 0), // 下面
+                new CANNON.Vec3(1, 0, 0),  // 右面
+                new CANNON.Vec3(-1, 0, 0), // 左面
+                new CANNON.Vec3(0, 0, 1),  // 前面
+                new CANNON.Vec3(0, 0, -1)  // 後面
+            ];
+
+            let maxDot = -1;
+            let topFace = 0;
+
+            faces.forEach((face, index) => {
+                const worldFace = diceBody.quaternion.vmult(face);
+                const dot = worldFace.dot(up);
+                if (dot > maxDot) {
+                    maxDot = dot;
+                    topFace = index;
+                }
+            });
+
+            // 面のインデックスをダイスの目に変換（1-6）
+            const faceValues = [1, 6, 2, 5, 3, 4];
+            return faceValues[topFace];
+        }
+
+        function showDiceResults() {
+            isRolling = false;
+            
+            // 結果からジオマンシーパターンを生成
+            const pattern = diceResults.map(result => result % 2 === 0 ? '2' : '1').join('');
+            
+            // シンボルを取得
+            let symbol = geomancySymbols[pattern];
+            if (!symbol) {
+                const keys = Object.keys(geomancySymbols);
+                symbol = geomancySymbols[keys[0]];
+            }
+            
+            // ダイアログの内容を更新
+            document.getElementById('symbol-image').innerHTML = symbol.symbol.replace(/\n/g, '<br>');
+            document.getElementById('symbol-name').textContent = symbol.name;
+            document.getElementById('symbol-meaning').textContent = symbol.meaning;
+            
+            // ダイアログを表示
+            document.getElementById('symbolDialog').classList.add('show');
+            
+            // ボタンを元に戻す
+            const rollBtn = document.getElementById('dice-roll-btn');
+            rollBtn.disabled = false;
+            rollBtn.textContent = 'ダイスを振る';
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (world) {
+                world.step(1/60);
+                
+                // 物理エンジンの位置を視覚的オブジェクトに反映
+                for (let i = 0; i < dicePhysics.length; i++) {
+                    if (diceVisual[i] && dicePhysics[i]) {
+                        diceVisual[i].position.copy(dicePhysics[i].position);
+                        diceVisual[i].quaternion.copy(dicePhysics[i].quaternion);
+                    }
+                }
+            }
+            
+            if (renderer && scene && camera) {
+                renderer.render(scene, camera);
+            }
         }
 
         function showAppPromo() {
