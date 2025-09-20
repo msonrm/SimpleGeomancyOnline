@@ -330,6 +330,42 @@
             border-radius: 12px;
         }
 
+        /* 2Dダイス用のスタイル */
+        .dice-2d {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .dice-2d.rolling {
+            animation: roll2d 1s infinite;
+        }
+
+        .dice-label {
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .dice-value {
+            font-size: 24px;
+        }
+
+        @keyframes roll2d {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.1); }
+            50% { transform: rotate(180deg) scale(1); }
+            75% { transform: rotate(270deg) scale(1.1); }
+        }
+
         @media (max-width: 480px) {
             .container {
                 padding: 16px;
@@ -529,8 +565,26 @@
             </div>
             
             <div style="flex: 1; display: flex; flex-direction: column;">
-                <div id="dice-container" style="flex: 1; min-height: 400px; position: relative; background: rgba(255,255,255,0.3); margin: 0 20px; border-radius: 12px;">
-                    <!-- Three.jsキャンバスがここに挿入されます -->
+                <div id="dice-container" style="flex: 1; min-height: 400px; position: relative; background: rgba(255,255,255,0.3); margin: 0 20px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <!-- 2Dフォールバック用のダイス表示 -->
+                    <div id="dice-2d-container" style="display: none; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                        <div class="dice-2d" data-index="0" style="background: #ff4444;">
+                            <div class="dice-label">火</div>
+                            <div class="dice-value">?</div>
+                        </div>
+                        <div class="dice-2d" data-index="1" style="background: #ffff44; color: #333;">
+                            <div class="dice-label">風</div>
+                            <div class="dice-value">?</div>
+                        </div>
+                        <div class="dice-2d" data-index="2" style="background: #4444ff;">
+                            <div class="dice-label">水</div>
+                            <div class="dice-value">?</div>
+                        </div>
+                        <div class="dice-2d" data-index="3" style="background: #44ff44; color: #333;">
+                            <div class="dice-label">地</div>
+                            <div class="dice-value">?</div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div style="padding: 16px 20px 20px 20px; text-align: center;">
@@ -593,14 +647,17 @@
         let diceVisual = [];
         let isRolling = false;
         let diceResults = [null, null, null, null];
+        let use3D = false; // 3D対応フラグ
 
         // ダイスの色（火・風・水・地）
         const diceColors = [
-            0xff4444, // 火（赤）
-            0xffff44, // 風（黄）
-            0x4444ff, // 水（青）
-            0x44ff44  // 地（緑）
+            '#ff4444', // 火（赤）
+            '#ffff44', // 風（黄）
+            '#4444ff', // 水（青）
+            '#44ff44'  // 地（緑）
         ];
+
+        const diceNames = ['火', '風', '水', '地'];
 
         // ジオマンシーのシンボル定義（16種類）
         const geomancySymbols = {
@@ -852,70 +909,144 @@
             }
         }
 
+        function showDiceOracle() {
+            hideAllScreens();
+            document.getElementById('dice-oracle-screen').classList.add('active');
+            setTimeout(() => {
+                initDiceScene();
+            }, 100);
+        }
+
+        function resetDiceOracle() {
+            diceResults = [null, null, null, null];
+            isRolling = false;
+            const rollBtn = document.getElementById('dice-roll-btn');
+            if (rollBtn) {
+                rollBtn.disabled = false;
+                rollBtn.textContent = 'ダイスを振る';
+            }
+            
+            // 2Dダイスをリセット
+            const dice2D = document.querySelectorAll('.dice-2d');
+            dice2D.forEach(dice => {
+                dice.classList.remove('rolling');
+                dice.querySelector('.dice-value').textContent = '?';
+            });
+        }
+
+        function checkWebGLSupport() {
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                return !!gl;
+            } catch (e) {
+                return false;
+            }
+        }
+
         function initDiceScene() {
             const container = document.getElementById('dice-container');
-            if (!container || container.querySelector('canvas')) return;
+            if (!container) return;
 
-            const width = container.clientWidth;
-            const height = container.clientHeight;
+            // WebGLサポートチェック
+            if (!checkWebGLSupport() || !window.THREE || !window.CANNON) {
+                console.log('3D not supported, using 2D fallback');
+                use3D = false;
+                init2DDice();
+                return;
+            }
 
-            // Three.js シーン設定
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xf5f0e8);
+            try {
+                if (container.querySelector('canvas')) return;
 
-            // カメラ（上から見下ろす視点）
-            camera = new THREE.OrthographicCamera(
-                width / -100, width / 100,
-                height / 100, height / -100,
-                0.1, 1000
-            );
-            camera.position.set(0, 10, 0);
-            camera.lookAt(0, 0, 0);
+                const width = container.clientWidth;
+                const height = container.clientHeight;
 
-            // レンダラー
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(width, height);
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            renderer.domElement.id = 'dice-canvas';
-            container.appendChild(renderer.domElement);
+                if (width <= 0 || height <= 0) {
+                    setTimeout(() => initDiceScene(), 500);
+                    return;
+                }
 
-            // ライト
-            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-            scene.add(ambientLight);
+                // Three.js シーン設定
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0xf5f0e8);
 
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(10, 20, 5);
-            directionalLight.castShadow = true;
-            directionalLight.shadow.mapSize.width = 2048;
-            directionalLight.shadow.mapSize.height = 2048;
-            scene.add(directionalLight);
+                // カメラ（上から見下ろす視点）
+                camera = new THREE.OrthographicCamera(
+                    width / -100, width / 100,
+                    height / 100, height / -100,
+                    0.1, 1000
+                );
+                camera.position.set(0, 10, 0);
+                camera.lookAt(0, 0, 0);
 
-            // 物理エンジン
-            world = new CANNON.World();
-            world.gravity.set(0, -30, 0);
-            world.broadphase = new CANNON.NaiveBroadphase();
+                // レンダラー
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(width, height);
+                renderer.shadowMap.enabled = true;
+                renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                renderer.domElement.id = 'dice-canvas';
+                container.appendChild(renderer.domElement);
 
-            // 床
-            const floorShape = new CANNON.Plane();
-            const floorBody = new CANNON.Body({ mass: 0 });
-            floorBody.addShape(floorShape);
-            floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
-            world.add(floorBody);
+                // ライト
+                const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+                scene.add(ambientLight);
 
-            // 床の視覚的表現
-            const floorGeometry = new THREE.PlaneGeometry(20, 20);
-            const floorMaterial = new THREE.MeshLambertMaterial({ color: 0xe8dcc6, transparent: true, opacity: 0.8 });
-            const floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
-            floorMesh.rotation.x = -Math.PI / 2;
-            floorMesh.receiveShadow = true;
-            scene.add(floorMesh);
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                directionalLight.position.set(10, 20, 5);
+                directionalLight.castShadow = true;
+                directionalLight.shadow.mapSize.width = 1024;
+                directionalLight.shadow.mapSize.height = 1024;
+                scene.add(directionalLight);
 
-            // 壁（ダイスが外に出ないように）
-            createWalls();
+                // 物理エンジン
+                world = new CANNON.World();
+                world.gravity.set(0, -30, 0);
+                world.broadphase = new CANNON.NaiveBroadphase();
 
-            // アニメーションループ
-            animate();
+                // 床
+                const floorShape = new CANNON.Plane();
+                const floorBody = new CANNON.Body({ mass: 0 });
+                floorBody.addShape(floorShape);
+                floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+                world.add(floorBody);
+
+                // 床の視覚的表現
+                const floorGeometry = new THREE.PlaneGeometry(20, 20);
+                const floorMaterial = new THREE.MeshLambertMaterial({ color: 0xe8dcc6, transparent: true, opacity: 0.8 });
+                const floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
+                floorMesh.rotation.x = -Math.PI / 2;
+                floorMesh.receiveShadow = true;
+                scene.add(floorMesh);
+
+                // 壁（ダイスが外に出ないように）
+                createWalls();
+
+                use3D = true;
+                console.log('3D initialized successfully');
+
+                // アニメーションループ
+                animate();
+
+            } catch (error) {
+                console.error('3D initialization failed:', error);
+                use3D = false;
+                init2DDice();
+            }
+        }
+
+        function init2DDice() {
+            const container = document.getElementById('dice-container');
+            const dice2DContainer = document.getElementById('dice-2d-container');
+            
+            // 3Dキャンバスがあれば削除
+            const canvas = container.querySelector('canvas');
+            if (canvas) {
+                canvas.remove();
+            }
+            
+            // 2Dダイスを表示
+            dice2DContainer.style.display = 'flex';
         }
 
         function createWalls() {
@@ -986,7 +1117,7 @@
 
                 // 視覚的ダイス
                 const diceGeometry = new THREE.BoxGeometry(1, 1, 1);
-                const diceMaterial = new THREE.MeshLambertMaterial({ color: diceColors[i] });
+                const diceMaterial = new THREE.MeshLambertMaterial({ color: parseInt(diceColors[i].replace('#', '0x')) });
                 const diceMesh = new THREE.Mesh(diceGeometry, diceMaterial);
                 diceMesh.castShadow = true;
                 diceMesh.receiveShadow = true;
@@ -1020,12 +1151,39 @@
             rollBtn.disabled = true;
             rollBtn.textContent = '振っています...';
 
-            createDice();
+            if (use3D) {
+                createDice();
+                // 3秒後にダイスが止まったかチェック開始
+                setTimeout(() => {
+                    checkDiceSettled();
+                }, 3000);
+            } else {
+                roll2DDice();
+            }
+        }
 
-            // 3秒後にダイスが止まったかチェック開始
+        function roll2DDice() {
+            const dice2D = document.querySelectorAll('.dice-2d');
+            
+            // アニメーション開始
+            dice2D.forEach(dice => {
+                dice.classList.add('rolling');
+                dice.querySelector('.dice-value').textContent = '?';
+            });
+            
+            // 1.5秒後に結果表示
             setTimeout(() => {
-                checkDiceSettled();
-            }, 3000);
+                dice2D.forEach((dice, index) => {
+                    dice.classList.remove('rolling');
+                    const result = Math.floor(Math.random() * 6) + 1;
+                    dice.querySelector('.dice-value').textContent = result;
+                    diceResults[index] = result;
+                });
+                
+                setTimeout(() => {
+                    showDiceResults();
+                }, 500);
+            }, 1500);
         }
 
         function checkDiceSettled() {
