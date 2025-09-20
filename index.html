@@ -535,7 +535,7 @@
                 
                 <div style="padding: 16px 20px 20px 20px; text-align: center;">
                     <p style="color: rgba(93,78,55,0.7); font-size: 14px; margin-bottom: 16px; line-height: 1.4;">
-                        4つのダイス（火・風・水・地）を振って、各要素の偶数・奇数の組み合わせからジオマンシーのシンボルが決まります。
+                        4つのダイス（火・風・水・地）を振って、各要素の偶数・奇数の組み合わせからジオマンシーのシンボルが決まりますよ。
                     </p>
                     <button class="roll-button" id="dice-roll-btn" onclick="rollPhysicalDice()">ダイスを振る</button>
                 </div>
@@ -569,8 +569,9 @@
         </div>
     </div>
 
-    <!-- Three.js のみ -->
+    <!-- Three.js と Cannon.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/1.15.1/cannon.min.js"></script>
 
     <script>
         // PWA用のサービスワーカー登録
@@ -587,7 +588,8 @@
         let isGenerating = false; // 生成中フラグ
 
         // 3Dダイス用の変数
-        let scene, camera, renderer;
+        let scene, camera, renderer, world;
+        let dicePhysics = [];
         let diceVisual = [];
         let isRolling = false;
         let diceResults = [null, null, null, null];
@@ -599,9 +601,6 @@
             0x4444ff, // 水（青）
             0x44ff44  // 地（緑）
         ];
-
-        // 簡易物理エンジン用の変数
-        let dicePhysics = [];
 
         // ジオマンシーのシンボル定義（16種類）
         const geomancySymbols = {
@@ -880,6 +879,7 @@
 
             console.log('Container size:', width, height);
             console.log('THREE available:', !!window.THREE);
+            console.log('CANNON available:', !!window.CANNON);
 
             // Three.js シーン設定
             scene = new THREE.Scene();
@@ -915,6 +915,20 @@
             directionalLight.shadow.mapSize.height = 1024;
             scene.add(directionalLight);
 
+            // 物理エンジン
+            world = new CANNON.World();
+            world.gravity.set(0, -30, 0);
+            world.broadphase = new CANNON.NaiveBroadphase();
+
+            console.log('Physics world created');
+
+            // 床
+            const floorShape = new CANNON.Plane();
+            const floorBody = new CANNON.Body({ mass: 0 });
+            floorBody.addShape(floorShape);
+            floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+            world.add(floorBody);
+
             // 床の視覚的表現
             const floorGeometry = new THREE.PlaneGeometry(20, 20);
             const floorMaterial = new THREE.MeshLambertMaterial({ color: 0xe8dcc6, transparent: true, opacity: 0.8 });
@@ -923,6 +937,9 @@
             floorMesh.receiveShadow = true;
             scene.add(floorMesh);
 
+            // 壁（ダイスが外に出ないように）
+            createWalls();
+
             console.log('Scene setup complete');
 
             // アニメーションループ
@@ -930,43 +947,72 @@
         }
 
         function createWalls() {
-            // 簡易物理なので壁は不要
+            const wallDistance = 8;
+            const wallHeight = 5;
+            
+            // 4つの壁を作成
+            const walls = [
+                { pos: [wallDistance, wallHeight/2, 0], rot: [0, 0, 0] }, // 右
+                { pos: [-wallDistance, wallHeight/2, 0], rot: [0, 0, 0] }, // 左
+                { pos: [0, wallHeight/2, wallDistance], rot: [0, 0, 0] }, // 奥
+                { pos: [0, wallHeight/2, -wallDistance], rot: [0, 0, 0] } // 手前
+            ];
+
+            walls.forEach(wall => {
+                const wallShape = new CANNON.Box(new CANNON.Vec3(0.5, wallHeight/2, wallDistance));
+                const wallBody = new CANNON.Body({ mass: 0 });
+                wallBody.addShape(wallShape);
+                wallBody.position.set(...wall.pos);
+                world.add(wallBody);
+            });
         }
 
         function createDice() {
             // 既存のダイスをクリア
+            dicePhysics.forEach(dice => world.remove(dice));
             diceVisual.forEach(dice => scene.remove(dice));
-            diceVisual = [];
             dicePhysics = [];
+            diceVisual = [];
 
             console.log('Creating dice...');
 
             for (let i = 0; i < 4; i++) {
-                // 簡易物理オブジェクト
-                const physics = {
-                    position: {
-                        x: (Math.random() - 0.5) * 6,
-                        y: 8 + i * 0.5,
-                        z: (Math.random() - 0.5) * 6
-                    },
-                    velocity: {
-                        x: (Math.random() - 0.5) * 8,
-                        y: 0,
-                        z: (Math.random() - 0.5) * 8
-                    },
-                    rotation: {
-                        x: Math.random() * Math.PI * 2,
-                        y: Math.random() * Math.PI * 2,
-                        z: Math.random() * Math.PI * 2
-                    },
-                    angularVelocity: {
-                        x: (Math.random() - 0.5) * 10,
-                        y: (Math.random() - 0.5) * 10,
-                        z: (Math.random() - 0.5) * 10
-                    },
-                    settled: false
-                };
-                dicePhysics.push(physics);
+                // 物理ダイス
+                const diceShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5));
+                const diceBody = new CANNON.Body({ mass: 1 });
+                diceBody.addShape(diceShape);
+                
+                // 初期位置（少しずつずらして配置）
+                diceBody.position.set(
+                    (Math.random() - 0.5) * 4,
+                    5 + i * 0.5,
+                    (Math.random() - 0.5) * 4
+                );
+                
+                // 初期回転と速度
+                diceBody.quaternion.set(
+                    Math.random(), Math.random(), Math.random(), Math.random()
+                ).normalize();
+                
+                diceBody.velocity.set(
+                    (Math.random() - 0.5) * 10,
+                    Math.random() * 5,
+                    (Math.random() - 0.5) * 10
+                );
+                
+                diceBody.angularVelocity.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20
+                );
+
+                // ダイス同士の跳ね返り係数を大きく
+                diceBody.material = new CANNON.Material();
+                diceBody.material.restitution = 0.9;
+                diceBody.material.friction = 0.3;
+
+                world.add(diceBody);
+                dicePhysics.push(diceBody);
 
                 // 視覚的ダイス
                 const diceGeometry = new THREE.BoxGeometry(1, 1, 1);
@@ -974,79 +1020,25 @@
                 const diceMesh = new THREE.Mesh(diceGeometry, diceMaterial);
                 diceMesh.castShadow = true;
                 diceMesh.receiveShadow = true;
-                
-                diceMesh.position.set(physics.position.x, physics.position.y, physics.position.z);
-                diceMesh.rotation.set(physics.rotation.x, physics.rotation.y, physics.rotation.z);
-                
                 scene.add(diceMesh);
                 diceVisual.push(diceMesh);
             }
 
             console.log('Dice created:', dicePhysics.length, diceVisual.length);
-        }
 
-        function updatePhysics() {
-            if (!isRolling) return;
-
-            const dt = 1/60;
-            const gravity = -15;
-            const bounce = 0.6;
-            const friction = 0.98;
-
+            // ダイス同士の跳ね返り設定
             for (let i = 0; i < dicePhysics.length; i++) {
-                const physics = dicePhysics[i];
-                const visual = diceVisual[i];
-
-                if (physics.settled) continue;
-
-                // 重力を適用
-                physics.velocity.y += gravity * dt;
-
-                // 位置を更新
-                physics.position.x += physics.velocity.x * dt;
-                physics.position.y += physics.velocity.y * dt;
-                physics.position.z += physics.velocity.z * dt;
-
-                // 床との衝突
-                if (physics.position.y <= 0.5) {
-                    physics.position.y = 0.5;
-                    physics.velocity.y = Math.abs(physics.velocity.y) * bounce;
-                    physics.velocity.x *= friction;
-                    physics.velocity.z *= friction;
-                    physics.angularVelocity.x *= friction;
-                    physics.angularVelocity.y *= friction;
-                    physics.angularVelocity.z *= friction;
+                for (let j = i + 1; j < dicePhysics.length; j++) {
+                    const contactMaterial = new CANNON.ContactMaterial(
+                        dicePhysics[i].material,
+                        dicePhysics[j].material,
+                        {
+                            friction: 0.3,
+                            restitution: 0.95 // 非常に大きな跳ね返り
+                        }
+                    );
+                    world.addContactMaterial(contactMaterial);
                 }
-
-                // 境界での跳ね返り
-                const boundary = 8;
-                if (Math.abs(physics.position.x) > boundary) {
-                    physics.position.x = Math.sign(physics.position.x) * boundary;
-                    physics.velocity.x *= -bounce;
-                }
-                if (Math.abs(physics.position.z) > boundary) {
-                    physics.position.z = Math.sign(physics.position.z) * boundary;
-                    physics.velocity.z *= -bounce;
-                }
-
-                // 回転を更新
-                physics.rotation.x += physics.angularVelocity.x * dt;
-                physics.rotation.y += physics.angularVelocity.y * dt;
-                physics.rotation.z += physics.angularVelocity.z * dt;
-
-                // 静止判定
-                const totalVel = Math.abs(physics.velocity.x) + Math.abs(physics.velocity.y) + Math.abs(physics.velocity.z);
-                const totalAngVel = Math.abs(physics.angularVelocity.x) + Math.abs(physics.angularVelocity.y) + Math.abs(physics.angularVelocity.z);
-                
-                if (totalVel < 0.1 && totalAngVel < 0.1 && physics.position.y <= 0.6) {
-                    physics.settled = true;
-                    physics.velocity = { x: 0, y: 0, z: 0 };
-                    physics.angularVelocity = { x: 0, y: 0, z: 0 };
-                }
-
-                // 視覚的オブジェクトを更新
-                visual.position.set(physics.position.x, physics.position.y, physics.position.z);
-                visual.rotation.set(physics.rotation.x, physics.rotation.y, physics.rotation.z);
             }
         }
 
