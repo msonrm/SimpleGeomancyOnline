@@ -107,20 +107,20 @@
         .info-title {
             font-size: 18px;
             font-weight: 600;
-            color: white;
+            color: #5d4e37;
             margin-bottom: 12px;
         }
 
         .info-text {
             font-size: 14px;
-            color: rgba(255,255,255,0.9);
+            color: rgba(93,78,55,0.8);
             line-height: 1.6;
             margin-bottom: 16px;
         }
 
         .app-link {
             display: inline-block;
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            background: #8b7355;
             color: white;
             padding: 12px 20px;
             border-radius: 25px;
@@ -128,21 +128,12 @@
             font-weight: 600;
             font-size: 14px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(238,90,36,0.3);
+            box-shadow: 0 4px 15px rgba(139,115,85,0.3);
         }
 
         .app-link:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(238,90,36,0.4);
-        }
-
-        .geomancy-symbol {
-            text-align: center;
-            font-size: 48px;
-            color: rgba(255,255,255,0.8);
-            margin: 20px 0;
-            font-family: monospace;
-            line-height: 0.8;
+            box-shadow: 0 6px 20px rgba(139,115,85,0.4);
         }
 
         .screen {
@@ -178,32 +169,6 @@
             color: #5d4e37;
             margin-bottom: 30px;
             font-weight: 300;
-        }
-
-        .dot-area {
-            background: rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 40px 20px;
-            margin: 20px 0;
-            min-height: 300px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px dashed rgba(255,255,255,0.3);
-        }
-
-        .dot-area:hover {
-            background: rgba(255,255,255,0.15);
-            border-color: rgba(255,255,255,0.5);
-        }
-
-        .dot-instruction {
-            color: rgba(255,255,255,0.8);
-            font-size: 18px;
-            margin-bottom: 20px;
         }
 
         .dot-zones {
@@ -260,17 +225,6 @@
             width: 100%;
             height: 100%;
             z-index: 1;
-        }
-
-        .dot.paired {
-            background: #4CAF50;
-        }
-
-        .dot-line {
-            width: 20px;
-            height: 2px;
-            background: #4CAF50;
-            margin: 0 4px;
         }
 
         .zone-label {
@@ -348,7 +302,7 @@
         }
 
         .roll-button {
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            background: #8b7355;
             color: white;
             border: none;
             padding: 16px 32px;
@@ -361,8 +315,8 @@
         }
 
         .roll-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(238,90,36,0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(139,115,85,0.3);
         }
 
         @media (max-width: 480px) {
@@ -378,6 +332,111 @@
                 padding: 20px;
                 font-size: 16px;
             }
+        }
+
+        /* シンボルダイアログ */
+        .symbol-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .symbol-dialog.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .symbol-content {
+            background: #f5f0e8;
+            border: 2px solid #8b7355;
+            border-radius: 12px;
+            width: calc(100% - 40px);
+            max-width: 400px;
+            max-height: calc(100% - 80px);
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .symbol-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px 0 24px;
+            border-bottom: 1px solid rgba(139,115,85,0.2);
+            margin-bottom: 20px;
+        }
+
+        .symbol-header h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #5d4e37;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #8b7355;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .close-button:hover {
+            background: rgba(139,115,85,0.1);
+            color: #5d4e37;
+        }
+
+        .symbol-body {
+            padding: 0 24px 24px 24px;
+        }
+
+        .symbol-image-area {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 8px;
+            border: 1px solid rgba(139,115,85,0.2);
+        }
+
+        .symbol-placeholder {
+            font-size: 48px;
+            font-family: monospace;
+            color: #5d4e37;
+            line-height: 1.2;
+            letter-spacing: 4px;
+        }
+
+        .symbol-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #5d4e37;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .symbol-meaning {
+            font-size: 15px;
+            color: #5d4e37;
+            line-height: 1.6;
+            text-align: left;
         }
     </style>
 </head>
@@ -468,9 +527,35 @@
                 
                 <button class="roll-button" onclick="rollAllDice()">ダイスを振る</button>
                 
-                <p class="info-text" style="color: rgba(255,255,255,0.7); font-size: 14px; margin-top: 20px;">
+                <p class="info-text" style="color: rgba(93,78,55,0.7); font-size: 14px; margin-top: 20px;">
                     4つのダイスの結果からシンボルが生成されます
                 </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- シンボルダイアログ -->
+    <div class="symbol-dialog" id="symbolDialog">
+        <div class="symbol-content">
+            <div class="symbol-header">
+                <h3>占い結果</h3>
+                <button class="close-button" onclick="closeSymbolDialog()">×</button>
+            </div>
+            
+            <div class="symbol-body">
+                <div class="symbol-image-area">
+                    <div class="symbol-placeholder" id="symbol-image">
+                        •<br>••<br>•<br>••
+                    </div>
+                </div>
+                
+                <div class="symbol-name" id="symbol-name">
+                    フォルトゥナ・マイナー（Fortuna Minor）
+                </div>
+                
+                <div class="symbol-meaning" id="symbol-meaning">
+                    小さな幸運・内なる力。自分自身の力で道を切り開く時期です。困難な状況でも、あなたの内に秘められた力と意志の強さが道を照らします。
+                </div>
             </div>
         </div>
     </div>
@@ -581,6 +666,9 @@
         }
 
         function addDot(zoneIndex, x, y) {
+            // 生成中は新しいドットを追加しない
+            if (isGenerating) return;
+            
             // 境界チェック
             if (x < 0 || x > 100 || y < 0 || y > 100) return;
             
@@ -604,6 +692,8 @@
         }
 
         function updateGenerateButton() {
+            if (isGenerating) return;
+            
             const generateBtn = document.getElementById('generate-btn');
             const allZonesHaveDots = zoneDots.every(zone => zone.length > 0);
             
@@ -616,18 +706,75 @@
 
         function generateSymbol() {
             const generateBtn = document.getElementById('generate-btn');
-            if (!generateBtn.classList.contains('active')) return;
+            if (!generateBtn.classList.contains('active') || isGenerating) return;
+            
+            // 即座にタップ処理を無効化
+            isGenerating = true;
+            generateBtn.classList.remove('active');
+            generateBtn.textContent = '生成中...';
             
             // 各ゾーンのドットをペアリング
             for (let i = 0; i < 4; i++) {
                 animatePairing(i);
             }
             
-            // 1.5秒後にシンボル結果を表示
+            // 線が引かれてから間を置いてダイアログ表示
             setTimeout(() => {
-                showSymbolResult();
-            }, 1500);
+                showSymbolDialog();
+            }, 2000);
         }
+
+        function showSymbolDialog() {
+            // 各ゾーンの偶奇を計算
+            const pattern = zoneDots.map(zone => {
+                return zone.length % 2 === 0 ? '2' : '1';
+            }).join('');
+            
+            // シンボルを取得
+            let symbol = geomancySymbols[pattern];
+            if (!symbol) {
+                const keys = Object.keys(geomancySymbols);
+                symbol = geomancySymbols[keys[0]];
+            }
+            
+            // ダイアログの内容を更新
+            document.getElementById('symbol-image').innerHTML = symbol.symbol.replace(/\n/g, '<br>');
+            document.getElementById('symbol-name').textContent = symbol.name;
+            document.getElementById('symbol-meaning').textContent = symbol.meaning;
+            
+            // ダイアログを表示
+            document.getElementById('symbolDialog').classList.add('show');
+        }
+
+        function closeSymbolDialog() {
+            document.getElementById('symbolDialog').classList.remove('show');
+            
+            // リセット
+            setTimeout(() => {
+                resetDotOracle();
+                isGenerating = false;
+                document.getElementById('generate-btn').textContent = 'シンボルを生成';
+            }, 300);
+        }
+
+        // 初期化時に追加するイベントリスナー
+        document.addEventListener('DOMContentLoaded', function() {
+            // ダイアログのクリック外で閉じる
+            document.getElementById('symbolDialog').addEventListener('click', (e) => {
+                if (e.target.id === 'symbolDialog') {
+                    closeSymbolDialog();
+                }
+            });
+
+            // ESCキーでダイアログを閉じる
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (document.getElementById('symbolDialog').classList.contains('show')) {
+                        closeSymbolDialog();
+                    }
+                }
+            });
+        });
 
         function animatePairing(zoneIndex) {
             const zoneElement = document.getElementById(`zone-${zoneIndex}`);
@@ -663,23 +810,6 @@
                     }
                 }, i * 100);
             }
-        }
-
-        function showSymbolResult() {
-            // 各ゾーンの偶奇を計算
-            const pattern = zoneDots.map(zone => {
-                return zone.length % 2 === 0 ? '2' : '1';
-            }).join('');
-            
-            // シンボルを取得
-            let symbol = geomancySymbols[pattern];
-            if (!symbol) {
-                // パターンが見つからない場合は最初のマッチするものを使用
-                const keys = Object.keys(geomancySymbols);
-                symbol = geomancySymbols[keys[0]];
-            }
-            
-            alert(`🔮 ${symbol.name}\n\n${symbol.meaning}\n\n${symbol.symbol}`);
         }
 
         function resetDiceOracle() {
