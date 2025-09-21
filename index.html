@@ -30,11 +30,10 @@
         .container {
             max-width: none;
             margin: 0;
-            padding: 20px 0;
+            padding: 20px;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
         }
 
         .oracle-screen .container {
@@ -43,7 +42,8 @@
 
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
+            margin-top: 20px;
         }
 
         .title {
@@ -51,7 +51,6 @@
             font-weight: 300;
             color: #5d4e37;
             text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            margin-bottom: 10px;
         }
 
         .subtitle {
@@ -64,7 +63,7 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            margin: 40px 0;
+            margin: 30px 0;
         }
 
         .oracle-button {
@@ -90,17 +89,21 @@
             transform: translateY(0);
         }
 
-        .oracle-button .emoji {
-            font-size: 24px;
-            margin-right: 12px;
-        }
-
         .info-section {
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
             border-radius: 16px;
             padding: 20px;
-            margin-top: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .app-promo-section {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: auto;
             border: 1px solid rgba(255,255,255,0.2);
         }
 
@@ -148,12 +151,14 @@
             background: none;
             border: none;
             color: #5d4e37;
-            padding: 8px 0;
+            padding: 16px 20px;
             font-size: 16px;
             cursor: pointer;
-            margin-bottom: 0;
+            margin-bottom: 20px;
             transition: all 0.3s ease;
             text-decoration: none;
+            display: block;
+            text-align: left;
         }
 
         .back-button:hover {
@@ -481,14 +486,6 @@
             max-height: 200px;
         }
 
-        .symbol-placeholder {
-            font-size: 48px;
-            font-family: monospace;
-            color: #5d4e37;
-            line-height: 1.2;
-            letter-spacing: 4px;
-        }
-
         .symbol-name {
             font-size: 18px;
             font-weight: 600;
@@ -542,19 +539,7 @@
         <!-- メイン画面 -->
         <div id="home-screen" class="screen active">
             <div class="header">
-                <h1 class="title">ジオマンシー</h1>
-            </div>
-
-            <div class="oracle-buttons">
-                <button class="oracle-button" onclick="showDotOracle()">
-                    <span class="emoji">⚫</span>
-                    ワンオラクル（ドット）
-                </button>
-                
-                <button class="oracle-button" onclick="showDiceOracle()">
-                    <span class="emoji">🎲</span>
-                    ワンオラクル（ダイス）
-                </button>
+                <h1 class="title">ジオマンシー・オンライン</h1>
             </div>
 
             <div class="info-section">
@@ -562,18 +547,32 @@
                 <p class="info-text">
                     古代から伝わる土占い。16のシンボルを使って、今のあなたに必要なメッセージを受け取ることができます。ワンオラクルは最もシンプルな占い方で、一つのシンボルからインスピレーションを得ます。
                 </p>
+            </div>
+
+            <div class="oracle-buttons">
+                <button class="oracle-button" onclick="showDotOracle()">
+                    ワンオラクル（ドット）
+                </button>
                 
-                <a href="#" class="app-link" onclick="showAppPromo()">
-                    📱 Geomancy Diary アプリ
+                <button class="oracle-button" onclick="showDiceOracle()">
+                    ワンオラクル（ダイス）
+                </button>
+            </div>
+
+            <div class="app-promo-section">
+                <h3 class="info-title">Geomancy Diary アプリ</h3>
+                <p class="info-text">
+                    より本格的なジオマンシー占いを楽しみたい方は、iPhoneアプリ「Geomancy Diary」をご利用ください。占い結果の保存や詳細な解説など、充実した機能をご用意しています。
+                </p>
+                <a href="https://apps.apple.com/jp/app/geomancy-diary/id6670341755" class="app-link" target="_blank" rel="noopener noreferrer">
+                    App Storeで見る
                 </a>
             </div>
         </div>
 
         <!-- ドットオラクル画面 -->
         <div id="dot-oracle-screen" class="screen">
-            <div style="padding: 16px 0 8px 0;">
-                <button class="back-button" style="margin-left: 20px;" onclick="showHome()">← 戻る</button>
-            </div>
+            <button class="back-button" onclick="showHome()">← 戻る</button>
             
             <div class="dot-zones">
                 <div class="dot-zone" onclick="tapZone(event, 0)" ontouchstart="handleTouch(event, 0)">
@@ -610,9 +609,7 @@
 
         <!-- ダイスオラクル画面 -->
         <div id="dice-oracle-screen" class="screen">
-            <div style="padding: 16px 0 8px 0;">
-                <button class="back-button" style="margin-left: 20px;" onclick="showHome()">← 戻る</button>
-            </div>
+            <button class="back-button" onclick="showHome()">← 戻る</button>
             
             <div style="flex: 1; display: flex; flex-direction: column;">
                 <div id="dice-3d-container" style="width: 100%; aspect-ratio: 1; max-width: 600px; margin: 0 auto; position: relative; background: rgba(255,255,255,0.3); border-radius: 12px;">
@@ -702,8 +699,8 @@
         }
 
         // ドット占い用の変数
-        let zoneDots = [[], [], [], []]; // 4つの領域のドット座標
-        let isGenerating = false; // 生成中フラグ
+        let zoneDots = [[], [], [], []];
+        let isGenerating = false;
 
         // 3D物理エンジン用の変数
         let scene, camera, renderer, world;
@@ -715,118 +712,22 @@
 
         // ジオマンシーのシンボル定義（16種類）
         const geomancySymbols = {
-            '2222': { 
-                name: 'Populus（人々）', 
-                meaning: '物事や人が多数ある状態。受け身。安定。', 
-                symbol: '••\n••\n••\n••',
-                yesno: 'イエス',
-                fortune: '吉'
-            },
-            '1111': { 
-                name: 'Via（道）', 
-                meaning: '変化、動くこと、過程。決断。積極性、能動性。', 
-                symbol: '•\n•\n•\n•',
-                yesno: 'ノー',
-                fortune: '吉でも凶でもない。旅や移動について吉'
-            },
-            '2112': { 
-                name: 'Conjunctio（つながり）', 
-                meaning: '違う者同士結びつく、目的を持って集まる、絆が生まれる。失せ物が見つかる。', 
-                symbol: '••\n•\n•\n••',
-                yesno: 'イエス',
-                fortune: '吉と凶の両方'
-            },
-            '1221': { 
-                name: 'Carcer（拘束）', 
-                meaning: '孤独、身動きが取れない、ひきこもり。停滞、現状維持。', 
-                symbol: '•\n••\n••\n•',
-                yesno: 'ノー',
-                fortune: '凶。セキュリティに関しては吉'
-            },
-            '2211': { 
-                name: 'Fortuna Major（大吉）', 
-                meaning: '大きな幸運。自分の思い通りにことが運ぶ。', 
-                symbol: '••\n••\n•\n•',
-                yesno: 'イエス',
-                fortune: '大吉'
-            },
-            '1122': { 
-                name: 'Fortuna Minor（小吉）', 
-                meaning: '小さく一時的な幸運、ささやかな幸せ。周りからの援助。', 
-                symbol: '•\n•\n••\n••',
-                yesno: 'イエス',
-                fortune: '小吉'
-            },
-            '2121': { 
-                name: 'Acquisitio（獲得）', 
-                meaning: '収穫、利益。願いが叶う。何かを受け取る、受け入れる。', 
-                symbol: '••\n•\n••\n•',
-                yesno: 'イエス',
-                fortune: '吉'
-            },
-            '1212': { 
-                name: 'Amissio（喪失）', 
-                meaning: '損失、愛情や金銭などを失う。病気やトラブル、悪癖がなくなる。', 
-                symbol: '•\n••\n•\n••',
-                yesno: 'ノー',
-                fortune: '凶'
-            },
-            '1222': { 
-                name: 'Laetitia（喜び）', 
-                meaning: '喜ばしいこと、笑い、成功。音楽や踊り。髭のある男性。', 
-                symbol: '•\n••\n••\n••',
-                yesno: 'イエス',
-                fortune: '吉'
-            },
-            '2221': { 
-                name: 'Tristitia（悲しみ）', 
-                meaning: '不幸、受難、宿命。', 
-                symbol: '••\n••\n••\n•',
-                yesno: 'ノー',
-                fortune: '凶。占いや魔術に関しては吉'
-            },
-            '1211': { 
-                name: 'Puella（少女）', 
-                meaning: '女性らしさ、美しさ。ときめき、嬉しさ。目先の楽しみ。', 
-                symbol: '•\n••\n•\n•',
-                yesno: 'イエス',
-                fortune: '吉'
-            },
-            '1121': { 
-                name: 'Puer（少年）', 
-                meaning: '男性らしさ、力強さ、未熟さ。未来を切り開く。', 
-                symbol: '•\n•\n••\n•',
-                yesno: 'ノー',
-                fortune: '凶。争い事には吉'
-            },
-            '2212': { 
-                name: 'Albus（白）', 
-                meaning: '公正、高潔さ、正義。片思いやプラトニック・ラブ。', 
-                symbol: '••\n••\n•\n••',
-                yesno: 'イエス',
-                fortune: '吉'
-            },
-            '2122': { 
-                name: 'Rubeus（赤）', 
-                meaning: '争い事、闘争心。悪いことには吉、良いことには凶。', 
-                symbol: '••\n•\n••\n••',
-                yesno: 'ノー',
-                fortune: '凶'
-            },
-            '2111': { 
-                name: 'Caput Draconis（竜の頭）', 
-                meaning: '始まり、新しい扉が開く、前例のない課題に取り組む。やりすぎの傾向。', 
-                symbol: '••\n•\n•\n•',
-                yesno: 'イエス',
-                fortune: '吉凶入り混じる。何かを始めるには吉'
-            },
-            '1112': { 
-                name: 'Cauda Draconis（竜の尾）', 
-                meaning: '終わり、物事の完成、途絶。吉は凶となり、凶は吉となる。', 
-                symbol: '•\n•\n•\n••',
-                yesno: 'ノー',
-                fortune: '吉でも凶でもない。何かを終わらせるには吉'
-            }
+            '2222': { name: 'Populus（人々）', meaning: '物事や人が多数ある状態。受け身。安定。', symbol: '••\n••\n••\n••', yesno: 'イエス', fortune: '吉' },
+            '1111': { name: 'Via（道）', meaning: '変化、動くこと、過程。決断。積極性、能動性。', symbol: '•\n•\n•\n•', yesno: 'ノー', fortune: '吉でも凶でもない。旅や移動について吉' },
+            '2112': { name: 'Conjunctio（つながり）', meaning: '違う者同士結びつく、目的を持って集まる、絆が生まれる。失せ物が見つかる。', symbol: '••\n•\n•\n••', yesno: 'イエス', fortune: '吉と凶の両方' },
+            '1221': { name: 'Carcer（拘束）', meaning: '孤独、身動きが取れない、ひきこもり。停滞、現状維持。', symbol: '•\n••\n••\n•', yesno: 'ノー', fortune: '凶。セキュリティに関しては吉' },
+            '2211': { name: 'Fortuna Major（大吉）', meaning: '大きな幸運。自分の思い通りにことが運ぶ。', symbol: '••\n••\n•\n•', yesno: 'イエス', fortune: '大吉' },
+            '1122': { name: 'Fortuna Minor（小吉）', meaning: '小さく一時的な幸運、ささやかな幸せ。周りからの援助。', symbol: '•\n•\n••\n••', yesno: 'イエス', fortune: '小吉' },
+            '2121': { name: 'Acquisitio（獲得）', meaning: '収穫、利益。願いが叶う。何かを受け取る、受け入れる。', symbol: '••\n•\n••\n•', yesno: 'イエス', fortune: '吉' },
+            '1212': { name: 'Amissio（喪失）', meaning: '損失、愛情や金銭などを失う。病気やトラブル、悪癖がなくなる。', symbol: '•\n••\n•\n••', yesno: 'ノー', fortune: '凶' },
+            '1222': { name: 'Laetitia（喜び）', meaning: '喜ばしいこと、笑い、成功。音楽や踊り。髭のある男性。', symbol: '•\n••\n••\n••', yesno: 'イエス', fortune: '吉' },
+            '2221': { name: 'Tristitia（悲しみ）', meaning: '不幸、受難、宿命。', symbol: '••\n••\n••\n•', yesno: 'ノー', fortune: '凶。占いや魔術に関しては吉' },
+            '1211': { name: 'Puella（少女）', meaning: '女性らしさ、美しさ。ときめき、嬉しさ。目先の楽しみ。', symbol: '•\n••\n•\n•', yesno: 'イエス', fortune: '吉' },
+            '1121': { name: 'Puer（少年）', meaning: '男性らしさ、力強さ、未熟さ。未来を切り開く。', symbol: '•\n•\n••\n•', yesno: 'ノー', fortune: '凶。争い事には吉' },
+            '2212': { name: 'Albus（白）', meaning: '公正、高潔さ、正義。片思いやプラトニック・ラブ。', symbol: '••\n••\n•\n••', yesno: 'イエス', fortune: '吉' },
+            '2122': { name: 'Rubeus（赤）', meaning: '争い事、闘争心。悪いことには吉、良いことには凶。', symbol: '••\n•\n••\n••', yesno: 'ノー', fortune: '凶' },
+            '2111': { name: 'Caput Draconis（竜の頭）', meaning: '始まり、新しい扉が開く、前例のない課題に取り組む。やりすぎの傾向。', symbol: '••\n•\n•\n•', yesno: 'イエス', fortune: '吉凶入り混じる。何かを始めるには吉' },
+            '1112': { name: 'Cauda Draconis（竜の尾）', meaning: '終わり、物事の完成、途絶。吉は凶となり、凶は吉となる。', symbol: '•\n•\n•\n••', yesno: 'ノー', fortune: '吉でも凶でもない。何かを終わらせるには吉' }
         };
 
         function showDotOracle() {
@@ -838,10 +739,7 @@
         function showDiceOracle() {
             hideAllScreens();
             document.getElementById('dice-oracle-screen').classList.add('active');
-            
-            setTimeout(() => {
-                init3DScene();
-            }, 100);
+            setTimeout(() => { init3DScene(); }, 100);
         }
 
         function showHome() {
@@ -860,7 +758,6 @@
                 const zoneElement = document.getElementById(`zone-${i}`);
                 const dots = zoneElement.querySelectorAll('.dot');
                 dots.forEach(dot => dot.remove());
-                
                 const canvas = document.getElementById(`canvas-${i}`);
                 const ctx = canvas.getContext('2d');
                 canvas.width = canvas.offsetWidth;
@@ -873,59 +770,46 @@
         function tapZone(event, zoneIndex) {
             event.preventDefault();
             event.stopPropagation();
-            
             const zoneElement = document.getElementById(`zone-${zoneIndex}`);
             const rect = zoneElement.getBoundingClientRect();
-            
             const x = ((event.clientX - rect.left) / rect.width) * 100;
             const y = ((event.clientY - rect.top) / rect.height) * 100;
-            
             addDot(zoneIndex, x, y);
         }
 
         function handleTouch(event, zoneIndex) {
             event.preventDefault();
             event.stopPropagation();
-            
             if (event.touches && event.touches.length > 0) {
                 const touch = event.touches[0];
                 const zoneElement = document.getElementById(`zone-${zoneIndex}`);
                 const rect = zoneElement.getBoundingClientRect();
-                
                 const x = ((touch.clientX - rect.left) / rect.width) * 100;
                 const y = ((touch.clientY - rect.top) / rect.height) * 100;
-                
                 addDot(zoneIndex, x, y);
             }
         }
 
         function addDot(zoneIndex, x, y) {
             if (isGenerating) return;
-            
             if (x < 0 || x > 100 || y < 0 || y > 100) return;
-            
             zoneDots[zoneIndex].push({ x, y });
-            
             const zoneElement = document.getElementById(`zone-${zoneIndex}`);
             const dot = document.createElement('div');
             dot.className = 'dot';
             dot.style.left = `${x}%`;
             dot.style.top = `${y}%`;
             zoneElement.appendChild(dot);
-            
             const canvas = document.getElementById(`canvas-${zoneIndex}`);
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
-            
             updateGenerateButton();
         }
 
         function updateGenerateButton() {
             if (isGenerating) return;
-            
             const generateBtn = document.getElementById('generate-btn');
             const allZonesHaveDots = zoneDots.every(zone => zone.length > 0);
-            
             if (allZonesHaveDots) {
                 generateBtn.classList.add('active');
             } else {
@@ -936,43 +820,33 @@
         function generateSymbol() {
             const generateBtn = document.getElementById('generate-btn');
             if (!generateBtn.classList.contains('active') || isGenerating) return;
-            
+            document.getElementById('symbol-image').src = '';
             isGenerating = true;
             generateBtn.classList.remove('active');
             generateBtn.textContent = '生成中...';
-            
             for (let i = 0; i < 4; i++) {
                 animatePairing(i);
             }
-            
-            setTimeout(() => {
-                showSymbolDialog();
-            }, 2000);
+            setTimeout(() => { showSymbolDialog(); }, 2000);
         }
 
         function showSymbolDialog() {
-            const pattern = zoneDots.map(zone => {
-                return zone.length % 2 === 0 ? '2' : '1';
-            }).join('');
-            
+            const pattern = zoneDots.map(zone => zone.length % 2 === 0 ? '2' : '1').join('');
             let symbol = geomancySymbols[pattern];
             if (!symbol) {
                 const keys = Object.keys(geomancySymbols);
                 symbol = geomancySymbols[keys[0]];
             }
-            
             document.getElementById('symbol-image').src = `${pattern}.png`;
             document.getElementById('symbol-name').textContent = symbol.name;
             document.getElementById('symbol-yesno').textContent = `Yes/No: ${symbol.yesno}`;
             document.getElementById('symbol-fortune').textContent = `吉凶: ${symbol.fortune}`;
             document.getElementById('symbol-meaning').textContent = symbol.meaning;
-            
             document.getElementById('symbolDialog').classList.add('show');
         }
 
         function closeSymbolDialog() {
             document.getElementById('symbolDialog').classList.remove('show');
-            
             setTimeout(() => {
                 resetDotOracle();
                 isGenerating = false;
@@ -986,10 +860,8 @@
             const ctx = canvas.getContext('2d');
             const dots = zoneElement.querySelectorAll('.dot');
             const dotCoords = zoneDots[zoneIndex];
-            
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
-            
             for (let i = 0; i < dots.length; i += 2) {
                 setTimeout(() => {
                     if (i + 1 < dots.length) {
@@ -997,7 +869,6 @@
                         const y1 = (dotCoords[i].y / 100) * canvas.height;
                         const x2 = (dotCoords[i + 1].x / 100) * canvas.width;
                         const y2 = (dotCoords[i + 1].y / 100) * canvas.height;
-                        
                         ctx.strokeStyle = '#8b7355';
                         ctx.lineWidth = 2;
                         ctx.beginPath();
@@ -1011,42 +882,25 @@
 
         function init3DScene() {
             const container = document.getElementById('dice-3d-container');
-            if (!container) {
-                return;
-            }
-
+            if (!container || !window.THREE || !window.CANNON) return;
             const existingCanvas = container.querySelector('canvas');
-            if (existingCanvas) {
-                existingCanvas.remove();
-            }
-
-            if (!window.THREE || !window.CANNON) {
-                return;
-            }
-
+            if (existingCanvas) existingCanvas.remove();
             try {
                 const width = container.clientWidth;
                 const height = container.clientHeight;
-
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color(0xf0f0f0);
-
-                camera = new THREE.OrthographicCamera(
-                    -10, 10, 10, -10, 0.1, 100
-                );
+                camera = new THREE.OrthographicCamera(-10, 10, 10, -10, 0.1, 100);
                 camera.position.set(0, 20, 0);
                 camera.lookAt(0, 0, 0);
-
                 renderer = new THREE.WebGLRenderer({ antialias: true });
                 renderer.setSize(width, height);
                 renderer.shadowMap.enabled = true;
                 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
                 renderer.domElement.style.borderRadius = '12px';
                 container.appendChild(renderer.domElement);
-
                 const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
                 scene.add(ambientLight);
-
                 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
                 directionalLight.position.set(-8, 18, -5);
                 directionalLight.castShadow = true;
@@ -1058,38 +912,18 @@
                 directionalLight.shadow.camera.bottom = -15;
                 directionalLight.shadow.radius = 12;
                 scene.add(directionalLight);
-
                 world = new CANNON.World();
                 world.gravity.set(0, -6.5, 0);
                 world.broadphase = new CANNON.NaiveBroadphase();
-                
                 const diceMaterial = new CANNON.Material('dice');
                 const floorMaterial = new CANNON.Material('floor');
-                
-                const diceDiceContact = new CANNON.ContactMaterial(
-                    diceMaterial,
-                    diceMaterial,
-                    {
-                        friction: 0.1,
-                        restitution: 1.2
-                    }
-                );
+                const diceDiceContact = new CANNON.ContactMaterial(diceMaterial, diceMaterial, { friction: 0.1, restitution: 1.2 });
                 world.addContactMaterial(diceDiceContact);
-                
-                const floorDiceContact = new CANNON.ContactMaterial(
-                    floorMaterial,
-                    diceMaterial,
-                    {
-                        friction: 0.4,
-                        restitution: 0.3
-                    }
-                );
+                const floorDiceContact = new CANNON.ContactMaterial(floorMaterial, diceMaterial, { friction: 0.4, restitution: 0.3 });
                 world.addContactMaterial(floorDiceContact);
-
                 createFloor();
                 createWalls();
                 animate3D();
-
             } catch (error) {
                 console.error('3Dシーン初期化エラー:', error);
             }
@@ -1098,20 +932,12 @@
         function createFloor() {
             const floorMaterial = new CANNON.Material('floor');
             const floorShape = new CANNON.Plane();
-            const floorBody = new CANNON.Body({ 
-                mass: 0,
-                material: floorMaterial
-            });
+            const floorBody = new CANNON.Body({ mass: 0, material: floorMaterial });
             floorBody.addShape(floorShape);
             floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
             world.add(floorBody);
-
             const floorGeometry = new THREE.PlaneGeometry(20, 20);
-            const floorMaterialThree = new THREE.MeshLambertMaterial({ 
-                color: 0xe8dcc6, 
-                transparent: true, 
-                opacity: 0.8 
-            });
+            const floorMaterialThree = new THREE.MeshLambertMaterial({ color: 0xe8dcc6, transparent: true, opacity: 0.8 });
             const floorMesh = new THREE.Mesh(floorGeometry, floorMaterialThree);
             floorMesh.rotation.x = -Math.PI / 2;
             floorMesh.receiveShadow = true;
@@ -1121,36 +947,24 @@
         function createWalls() {
             const wallHeight = 12;
             const roomSize = 12;
-            
             const wallPositions = [
                 { x: roomSize, y: wallHeight/2, z: 0, rotY: 0 },
                 { x: -roomSize, y: wallHeight/2, z: 0, rotY: 0 },
                 { x: 0, y: wallHeight/2, z: roomSize, rotY: Math.PI/2 },
                 { x: 0, y: wallHeight/2, z: -roomSize, rotY: Math.PI/2 }
             ];
-
-            wallPositions.forEach((pos, index) => {
+            wallPositions.forEach((pos) => {
                 const wallShape = new CANNON.Box(new CANNON.Vec3(0.5, wallHeight/2, roomSize));
                 const wallBody = new CANNON.Body({ mass: 0 });
                 wallBody.addShape(wallShape);
                 wallBody.position.set(pos.x, pos.y, pos.z);
-                if (pos.rotY) {
-                    wallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), pos.rotY);
-                }
+                if (pos.rotY) wallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), pos.rotY);
                 world.add(wallBody);
-
                 const wallGeometry = new THREE.BoxGeometry(1, wallHeight, roomSize * 2);
-                const wallMaterialThree = new THREE.MeshLambertMaterial({ 
-                    color: 0xd4c4a8, 
-                    transparent: true, 
-                    opacity: 0,
-                    visible: false
-                });
+                const wallMaterialThree = new THREE.MeshLambertMaterial({ color: 0xd4c4a8, transparent: true, opacity: 0, visible: false });
                 const wallMesh = new THREE.Mesh(wallGeometry, wallMaterialThree);
                 wallMesh.position.set(pos.x, pos.y, pos.z);
-                if (pos.rotY) {
-                    wallMesh.rotation.y = pos.rotY;
-                }
+                if (pos.rotY) wallMesh.rotation.y = pos.rotY;
                 wallMesh.castShadow = false;
                 wallMesh.receiveShadow = false;
                 scene.add(wallMesh);
@@ -1159,21 +973,13 @@
 
         function animate3D() {
             animationId = requestAnimationFrame(animate3D);
-            
-            if (world) {
-                world.step(1/60);
-            }
-            
-            if (renderer && scene && camera) {
-                renderer.render(scene, camera);
-            }
+            if (world) world.step(1/60);
+            if (renderer && scene && camera) renderer.render(scene, camera);
         }
 
         function initDicePhysics() {
-            if (!world || !scene) {
-                return;
-            }
-            
+            if (!world || !scene) return;
+            document.getElementById('symbol-image').src = '';
             createGeomancyDice();
         }
 
@@ -1181,12 +987,10 @@
             const shape = new THREE.Shape();
             const eps = 0.00001;
             const radius0 = radius - eps;
-            
             shape.absarc(eps, eps, eps, -Math.PI / 2, -Math.PI, true);
             shape.absarc(eps, height - radius * 2, eps, Math.PI, Math.PI / 2, true);
             shape.absarc(width - radius * 2, height - radius * 2, eps, Math.PI / 2, 0, true);
             shape.absarc(width - radius * 2, eps, eps, 0, -Math.PI / 2, true);
-            
             const geometry = new THREE.ExtrudeGeometry(shape, {
                 depth: depth - radius * 2,
                 bevelEnabled: true,
@@ -1196,7 +1000,6 @@
                 bevelThickness: radius,
                 curveSegments: smoothness
             });
-            
             geometry.center();
             return geometry;
         }
@@ -1204,96 +1007,52 @@
         function createGeomancyDice() {
             clearDice();
             resetDiceResults();
-            
             const elements = ['fire', 'air', 'water', 'earth'];
             for (let i = 0; i < 4; i++) {
                 const dice = createSingleDice(i, elements[i]);
                 diceObjects.push(dice);
             }
-            
             checkDiceSettled();
         }
 
         function createSingleDice(index, element) {
-            const positions = [
-                [-3, 15, -3],
-                [3, 16, -3],
-                [-3, 17, 3],
-                [3, 18, 3]
-            ];
+            const positions = [[-3, 15, -3], [3, 16, -3], [-3, 17, 3], [3, 18, 3]];
             const pos = positions[index];
-            
             const diceShape = new CANNON.Box(new CANNON.Vec3(1.5, 1.5, 1.5));
             const diceMaterial = new CANNON.Material('dice');
-            const diceBody = new CANNON.Body({ 
-                mass: 1,
-                material: diceMaterial,
-                linearDamping: 0.1,
-                angularDamping: 0.1
-            });
+            const diceBody = new CANNON.Body({ mass: 1, material: diceMaterial, linearDamping: 0.1, angularDamping: 0.1 });
             diceBody.addShape(diceShape);
             diceBody.position.set(pos[0], pos[1], pos[2]);
-            
-            diceBody.angularVelocity.set(
-                (Math.random() - 0.5) * 10,
-                (Math.random() - 0.5) * 10,
-                (Math.random() - 0.5) * 10
-            );
-            
+            diceBody.angularVelocity.set((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10);
             world.add(diceBody);
-
-            const colors = {
-                fire: 0xffcccc,
-                air: 0xffffcc,
-                water: 0xccddff,
-                earth: 0xccffcc
-            };
-
+            const colors = { fire: 0xffcccc, air: 0xffffcc, water: 0xccddff, earth: 0xccffcc };
             const diceGeometry = createRoundedBoxGeometry(3.0, 3.0, 3.0, 0.3, 8);
             const diceMaterialThree = new THREE.MeshLambertMaterial({ color: colors[element] });
             const diceMesh = new THREE.Mesh(diceGeometry, diceMaterialThree);
             diceMesh.castShadow = true;
             diceMesh.receiveShadow = true;
             scene.add(diceMesh);
-
             createDiceDots(diceMesh);
-
-            const diceObject = {
-                body: diceBody,
-                mesh: diceMesh,
-                id: index,
-                element: element
-            };
-
+            const diceObject = { body: diceBody, mesh: diceMesh, id: index, element: element };
             function updateDice() {
                 if (diceBody && diceMesh) {
                     diceMesh.position.copy(diceBody.position);
                     diceMesh.quaternion.copy(diceBody.quaternion);
                 }
             }
-
             const originalAnimate = animate3D;
             animate3D = function() {
                 originalAnimate();
                 updateDice();
             };
-
             return diceObject;
         }
 
         function createDiceDots(diceMesh) {
             const dotGeometry = new THREE.CircleGeometry(0.24, 16);
-            const dotMaterial = new THREE.MeshBasicMaterial({ 
-                color: 0x333333,
-                side: THREE.DoubleSide
-            });
-
-            const faceValues = [
-                1, 2, 1, 2, 1, 2
-            ];
-            
+            const dotMaterial = new THREE.MeshBasicMaterial({ color: 0x333333, side: THREE.DoubleSide });
+            const faceValues = [1, 2, 1, 2, 1, 2];
             diceMesh.userData.faceValues = faceValues;
-
             const faces = [
                 { normal: [1, 0, 0], center: [1.51, 0, 0], rotation: [0, Math.PI/2, 0], index: 0 },
                 { normal: [-1, 0, 0], center: [-1.51, 0, 0], rotation: [0, -Math.PI/2, 0], index: 1 },
@@ -1302,21 +1061,15 @@
                 { normal: [0, 0, 1], center: [0, 0, 1.51], rotation: [0, 0, 0], index: 4 },
                 { normal: [0, 0, -1], center: [0, 0, -1.51], rotation: [0, Math.PI, 0], index: 5 }
             ];
-
             faces.forEach((face) => {
                 const dotCount = faceValues[face.index];
-                
                 if (dotCount === 1) {
                     const dot = new THREE.Mesh(dotGeometry, dotMaterial);
                     dot.position.set(face.center[0], face.center[1], face.center[2]);
                     dot.rotation.set(face.rotation[0], face.rotation[1], face.rotation[2]);
                     diceMesh.add(dot);
                 } else {
-                    const positions = [
-                        [face.center[0] - 0.6, face.center[1] - 0.6, face.center[2]],
-                        [face.center[0] + 0.6, face.center[1] + 0.6, face.center[2]]
-                    ];
-                    
+                    const positions = [[face.center[0] - 0.6, face.center[1] - 0.6, face.center[2]], [face.center[0] + 0.6, face.center[1] + 0.6, face.center[2]]];
                     if (face.normal[0] !== 0) {
                         positions[0] = [face.center[0], face.center[1] - 0.6, face.center[2] - 0.6];
                         positions[1] = [face.center[0], face.center[1] + 0.6, face.center[2] + 0.6];
@@ -1324,7 +1077,6 @@
                         positions[0] = [face.center[0] - 0.6, face.center[1], face.center[2] - 0.6];
                         positions[1] = [face.center[0] + 0.6, face.center[1], face.center[2] + 0.6];
                     }
-                    
                     positions.forEach(pos => {
                         const dot = new THREE.Mesh(dotGeometry, dotMaterial);
                         dot.position.set(pos[0], pos[1], pos[2]);
@@ -1337,12 +1089,8 @@
 
         function clearDice() {
             diceObjects.forEach(dice => {
-                if (dice.body) {
-                    world.remove(dice.body);
-                }
-                if (dice.mesh) {
-                    scene.remove(dice.mesh);
-                }
+                if (dice.body) world.remove(dice.body);
+                if (dice.mesh) scene.remove(dice.mesh);
             });
             diceObjects = [];
             diceResults = [];
@@ -1365,31 +1113,22 @@
         function checkDiceSettled() {
             const checkInterval = setInterval(() => {
                 let allSettled = true;
-                
                 diceObjects.forEach(dice => {
                     const velocity = dice.body.velocity.length();
                     const angularVelocity = dice.body.angularVelocity.length();
-                    
-                    if (velocity > 0.01 || angularVelocity > 0.01) {
-                        allSettled = false;
-                    }
+                    if (velocity > 0.01 || angularVelocity > 0.01) allSettled = false;
                 });
-                
                 if (allSettled) {
                     clearInterval(checkInterval);
-                    setTimeout(() => {
-                        calculateDiceResults();
-                    }, 500);
+                    setTimeout(() => { calculateDiceResults(); }, 500);
                 }
             }, 100);
         }
 
         function calculateDiceResults() {
             diceResults = [];
-            
             diceObjects.forEach((dice, index) => {
                 const upVector = new THREE.Vector3(0, 1, 0);
-                
                 const faceNormals = [
                     new THREE.Vector3(1, 0, 0),
                     new THREE.Vector3(-1, 0, 0),
@@ -1398,72 +1137,46 @@
                     new THREE.Vector3(0, 0, 1),
                     new THREE.Vector3(0, 0, -1)
                 ];
-                
                 let maxDot = -1;
                 let topFaceIndex = 0;
-                
                 faceNormals.forEach((faceNormal, faceIndex) => {
                     const rotatedNormal = faceNormal.clone();
                     rotatedNormal.applyQuaternion(dice.mesh.quaternion);
-                    
                     const dot = upVector.dot(rotatedNormal);
-                    
                     if (dot > maxDot) {
                         maxDot = dot;
                         topFaceIndex = faceIndex;
                     }
                 });
-                
                 const result = dice.mesh.userData.faceValues[topFaceIndex];
                 diceResults.push(result);
-                
                 updateDiceResult(index, result);
             });
-            
-            setTimeout(() => {
-                generateSymbolFromDice();
-            }, 1500);
+            setTimeout(() => { generateSymbolFromDice(); }, 1500);
         }
 
         function generateSymbolFromDice() {
-            if (diceResults.length !== 4) {
-                return;
-            }
-            
+            if (diceResults.length !== 4) return;
             const pattern = diceResults.join('');
-            
             let symbol = geomancySymbols[pattern];
             if (!symbol) {
                 const keys = Object.keys(geomancySymbols);
                 symbol = geomancySymbols[keys[0]];
             }
-            
             document.getElementById('symbol-image').src = `${pattern}.png`;
             document.getElementById('symbol-name').textContent = symbol.name;
             document.getElementById('symbol-yesno').textContent = `Yes/No: ${symbol.yesno}`;
             document.getElementById('symbol-fortune').textContent = `吉凶: ${symbol.fortune}`;
             document.getElementById('symbol-meaning').textContent = symbol.meaning;
-            
             document.getElementById('symbolDialog').classList.add('show');
-        }
-
-        function showAppPromo() {
-            alert('Geomancy Diary アプリの詳細ページへ移動します\n（実装予定）');
         }
 
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('symbolDialog').addEventListener('click', (e) => {
-                if (e.target.id === 'symbolDialog') {
-                    closeSymbolDialog();
-                }
+                if (e.target.id === 'symbolDialog') closeSymbolDialog();
             });
-
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    if (document.getElementById('symbolDialog').classList.contains('show')) {
-                        closeSymbolDialog();
-                    }
-                }
+                if (e.key === 'Escape' && document.getElementById('symbolDialog').classList.contains('show')) closeSymbolDialog();
             });
         });
 
