@@ -7,9 +7,6 @@
     <meta name="description" content="シンプルなジオマンシー占いアプリ - ワンオラクルでメッセージを受け取ろう">
     <meta name="theme-color" content="#2c3e50">
     
-    <!-- PWA manifest -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIuOCuOOCquODnuODs+OCt+ODvOODu+ODr+ODs+OCquODqeOCr+ODqyIsCiAgInNob3J0X25hbWUiOiAi44K444Kq44Oe44Oz44K344O844AA44Ov44Oz44Kq44Op44Kv44OrIiwKICAic3RhcnRfdXJsIjogIi4vIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMmMzZTUwIiwKICAidGhlbWVfY29sb3IiOiAiIzJjM2U1MCIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwYUQwaU1USTRJaUJvWldsbmFIUTlJakV5T0NJZ2RtbGxkMEp2ZUQwaU1DQXdJREV5T0NBeU9DSWdlRzFzYm5NOUltaDBkSEE2THk5M2QzY3Vkek11YjNKbkx6SXdNREF2YzNabklpQm1hV3hzUFNJalpEVXhaVGhtSWo0S1BHSjFkSFJ2Ym5NZ2RISmhibk5tYjNKdFBTSjBjbUZ1YzJ4aGRHVW9OalFnTmpRcElpQm1hV3hzUFNJalpEVXhaVGhtSWo0S1BISmxZM1FnZUQwaU1UZ2lJSGs5SWpFNElpQjNhV1IwYUQwaU9Ua2lJR2hsYVdkb2REODFNQ0lpSUhKNFBTSTFJaUJtYVd4c1BTSWpNVGMwT0RGaklqNEtQSEpsWTNRZ2VEMGlNVGdpSUhrOUlqYzBJaUIzYVdSMGFEMGlPVGtpSUdobGFXZG9kRDBpTXpZaUlISjRQU0kxSWlCbWFXeHNQU0lqTVRjME9ERmpJajRLUEdOcGNtTnNaU0JqZUQwaU5qa2lJR041UFNJMk9DSWdjajBpT1NJZ1ptbHNiRDBpSTJabU16UXpOQ0krQ2lCOEwzTjJaejQ9IiwKICAgICAgInNpemVzIjogIjEyOHgxMjgiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0KfQ==">
-    
     <style>
         * {
             margin: 0;
@@ -201,10 +198,6 @@
             border-bottom: none;
         }
 
-        .dot-zone:hover {
-            background: rgba(255,255,255,0.7);
-        }
-
         .dots-display {
             position: relative;
             width: 100%;
@@ -330,7 +323,6 @@
             transform: none;
         }
 
-        /* ダイス結果表示エリア */
         .dice-results {
             display: flex;
             justify-content: center;
@@ -398,7 +390,6 @@
             font-size: 16px;
         }
 
-        /* シンボルダイアログ */
         .symbol-dialog {
             position: fixed;
             top: 0;
@@ -426,17 +417,14 @@
             border-radius: 12px;
             width: calc(100% - 40px);
             max-width: 400px;
-            max-height: calc(100% - 80px);
-            overflow-y: auto;
             position: relative;
+            padding: 24px;
         }
 
         .symbol-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 24px 0 24px;
-            border-bottom: 1px solid rgba(139,115,85,0.2);
             margin-bottom: 20px;
         }
 
@@ -465,10 +453,6 @@
         .close-button:hover {
             background: rgba(139,115,85,0.1);
             color: #5d4e37;
-        }
-
-        .symbol-body {
-            padding: 0 24px 24px 24px;
         }
 
         .symbol-image-area {
@@ -536,7 +520,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- メイン画面 -->
         <div id="home-screen" class="screen active">
             <div class="header">
                 <h1 class="title">ジオマンシー・オンライン</h1>
@@ -562,15 +545,17 @@
             <div class="app-promo-section">
                 <h3 class="info-title">Geomancy Diary アプリ</h3>
                 <p class="info-text">
-                    より本格的なジオマンシー占いを楽しみたい方は、iPhoneアプリ「Geomancy Diary」をご利用ください。占い結果の保存や詳細な解説など、充実した機能をご用意しています。
+                    より本格的なジオマンシー占いを楽しみたい方は、スマートフォンアプリ「Geomancy Diary」をご利用ください。
                 </p>
                 <a href="https://apps.apple.com/jp/app/geomancy-diary/id6670341755" class="app-link" target="_blank" rel="noopener noreferrer">
-                    App Storeで見る
+                    App Store（iPhone/iPad）
+                </a>
+                <a href="https://play.google.com/store/apps/details?id=io.kodular.msonrm.geomancy_diary" class="app-link" target="_blank" rel="noopener noreferrer" style="margin-left: 10px;">
+                    Google Play（Android）
                 </a>
             </div>
         </div>
 
-        <!-- ドットオラクル画面 -->
         <div id="dot-oracle-screen" class="screen">
             <button class="back-button" onclick="showHome()">← 戻る</button>
             
@@ -607,13 +592,11 @@
             </div>
         </div>
 
-        <!-- ダイスオラクル画面 -->
         <div id="dice-oracle-screen" class="screen">
             <button class="back-button" onclick="showHome()">← 戻る</button>
             
             <div style="flex: 1; display: flex; flex-direction: column;">
                 <div id="dice-3d-container" style="width: 100%; aspect-ratio: 1; max-width: 600px; margin: 0 auto; position: relative; background: rgba(255,255,255,0.3); border-radius: 12px;">
-                    <!-- Three.jsキャンバスがここに挿入されます -->
                 </div>
                 
                 <div style="padding: 16px 20px 20px 20px; text-align: center;">
@@ -621,7 +604,6 @@
                         4つのエレメント（火・風・水・地）を表すダイス（1と2の目のみ）を振って、シンボルを生成します。
                     </p>
                     
-                    <!-- ダイス結果表示エリア -->
                     <div class="dice-results">
                         <div class="dice-result-container">
                             <div class="dice-result-box fire">
@@ -655,7 +637,6 @@
         </div>
     </div>
 
-    <!-- シンボルダイアログ -->
     <div class="symbol-dialog" id="symbolDialog">
         <div class="symbol-content">
             <div class="symbol-header">
@@ -663,54 +644,36 @@
                 <button class="close-button" onclick="closeSymbolDialog()">×</button>
             </div>
             
-            <div class="symbol-body">
-                <div class="symbol-image-area">
-                    <img class="symbol-image" id="symbol-image" src="1212.png" alt="シンボル">
-                </div>
-                
-                <div class="symbol-name" id="symbol-name">
-                    Fortuna Minor（小吉）
-                </div>
-                
-                <div class="symbol-attributes">
-                    <div class="symbol-attribute" id="symbol-yesno">Yes/No: イエス</div>
-                    <div class="symbol-attribute" id="symbol-fortune">吉凶: 小吉</div>
-                </div>
-                
-                <div class="symbol-meaning" id="symbol-meaning">
-                    小さく一時的な幸運、ささやかな幸せ。周りからの援助。
-                </div>
+            <div class="symbol-image-area">
+                <img class="symbol-image" id="symbol-image" src="" alt="シンボル">
+            </div>
+            
+            <div class="symbol-name" id="symbol-name">
+                Fortuna Minor（小吉）
+            </div>
+            
+            <div class="symbol-attributes">
+                <div class="symbol-attribute" id="symbol-yesno">Yes/No: イエス</div>
+                <div class="symbol-attribute" id="symbol-fortune">吉凶: 小吉</div>
+            </div>
+            
+            <div class="symbol-meaning" id="symbol-meaning">
+                小さく一時的な幸運、ささやかな幸せ。周りからの援助。
             </div>
         </div>
     </div>
 
-    <!-- Three.js と Cannon.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.js"></script>
 
     <script>
-        // PWA用のサービスワーカー登録
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsIGV2ZW50ID0+IHsKICBldmVudC5yZXNwb25kV2l0aChmZXRjaChldmVudC5yZXF1ZXN0KSk7Cn0pOw==')
-                .then(() => console.log('SW registered'))
-                .catch(() => console.log('SW registration failed'));
-            });
-        }
-
-        // ドット占い用の変数
         let zoneDots = [[], [], [], []];
         let isGenerating = false;
-
-        // 3D物理エンジン用の変数
         let scene, camera, renderer, world;
         let animationId;
-
-        // ダイス管理用の配列
         let diceObjects = [];
         let diceResults = [];
 
-        // ジオマンシーのシンボル定義（16種類）
         const geomancySymbols = {
             '2222': { name: 'Populus（人々）', meaning: '物事や人が多数ある状態。受け身。安定。', symbol: '••\n••\n••\n••', yesno: 'イエス', fortune: '吉' },
             '1111': { name: 'Via（道）', meaning: '変化、動くこと、過程。決断。積極性、能動性。', symbol: '•\n•\n•\n•', yesno: 'ノー', fortune: '吉でも凶でもない。旅や移動について吉' },
@@ -739,7 +702,10 @@
         function showDiceOracle() {
             hideAllScreens();
             document.getElementById('dice-oracle-screen').classList.add('active');
-            setTimeout(() => { init3DScene(); }, 100);
+            setTimeout(() => { 
+                init3DScene();
+                createIdleDice();
+            }, 100);
         }
 
         function showHome() {
@@ -837,7 +803,6 @@
                 const keys = Object.keys(geomancySymbols);
                 symbol = geomancySymbols[keys[0]];
             }
-            document.getElementById('symbol-image').src = `${pattern}.png`;
             document.getElementById('symbol-name').textContent = symbol.name;
             document.getElementById('symbol-yesno').textContent = `Yes/No: ${symbol.yesno}`;
             document.getElementById('symbol-fortune').textContent = `吉凶: ${symbol.fortune}`;
@@ -848,9 +813,16 @@
         function closeSymbolDialog() {
             document.getElementById('symbolDialog').classList.remove('show');
             setTimeout(() => {
-                resetDotOracle();
-                isGenerating = false;
-                document.getElementById('generate-btn').textContent = 'シンボルを生成';
+                const currentScreen = document.querySelector('.screen.active');
+                if (currentScreen && currentScreen.id === 'dot-oracle-screen') {
+                    resetDotOracle();
+                    isGenerating = false;
+                    document.getElementById('generate-btn').textContent = 'シンボルを生成';
+                } else if (currentScreen && currentScreen.id === 'dice-oracle-screen') {
+                    clearDice();
+                    createIdleDice();
+                    resetDiceResults();
+                }
             }, 300);
         }
 
@@ -980,7 +952,57 @@
         function initDicePhysics() {
             if (!world || !scene) return;
             document.getElementById('symbol-image').src = '';
+            clearDice();
             createGeomancyDice();
+        }
+
+        function createIdleDice() {
+            if (!world || !scene) return;
+            clearDice();
+            resetDiceResults();
+            const elements = ['fire', 'air', 'water', 'earth'];
+            const positions = [[-3, 15, -3], [3, 16, -3], [-3, 17, 3], [3, 18, 3]];
+            
+            for (let i = 0; i < 4; i++) {
+                const pos = positions[i];
+                const colors = { fire: 0xffcccc, air: 0xffffcc, water: 0xccddff, earth: 0xccffcc };
+                const diceGeometry = createRoundedBoxGeometry(3.0, 3.0, 3.0, 0.3, 8);
+                const diceMaterialThree = new THREE.MeshLambertMaterial({ color: colors[elements[i]] });
+                const diceMesh = new THREE.Mesh(diceGeometry, diceMaterialThree);
+                diceMesh.position.set(pos[0], pos[1], pos[2]);
+                diceMesh.castShadow = true;
+                diceMesh.receiveShadow = true;
+                scene.add(diceMesh);
+                createDiceDots(diceMesh);
+                
+                const diceObject = { mesh: diceMesh, id: i, element: elements[i], idleRotation: true };
+                diceObjects.push(diceObject);
+            }
+            
+            animateIdleDice();
+        }
+
+        function animateIdleDice() {
+            diceObjects.forEach((dice) => {
+                if (dice.idleRotation && dice.mesh) {
+                    dice.mesh.rotation.x += 0.01;
+                    dice.mesh.rotation.y += 0.015;
+                    dice.mesh.rotation.z += 0.008;
+                }
+            });
+        }
+
+        function animate3D() {
+            animationId = requestAnimationFrame(animate3D);
+            if (world) world.step(1/60);
+            animateIdleDice();
+            diceObjects.forEach((dice) => {
+                if (dice.body && dice.mesh && !dice.idleRotation) {
+                    dice.mesh.position.copy(dice.body.position);
+                    dice.mesh.quaternion.copy(dice.body.quaternion);
+                }
+            });
+            if (renderer && scene && camera) renderer.render(scene, camera);
         }
 
         function createRoundedBoxGeometry(width, height, depth, radius, smoothness) {
@@ -1033,18 +1055,7 @@
             diceMesh.receiveShadow = true;
             scene.add(diceMesh);
             createDiceDots(diceMesh);
-            const diceObject = { body: diceBody, mesh: diceMesh, id: index, element: element };
-            function updateDice() {
-                if (diceBody && diceMesh) {
-                    diceMesh.position.copy(diceBody.position);
-                    diceMesh.quaternion.copy(diceBody.quaternion);
-                }
-            }
-            const originalAnimate = animate3D;
-            animate3D = function() {
-                originalAnimate();
-                updateDice();
-            };
+            const diceObject = { body: diceBody, mesh: diceMesh, id: index, element: element, idleRotation: false };
             return diceObject;
         }
 
@@ -1163,7 +1174,6 @@
                 const keys = Object.keys(geomancySymbols);
                 symbol = geomancySymbols[keys[0]];
             }
-            document.getElementById('symbol-image').src = `${pattern}.png`;
             document.getElementById('symbol-name').textContent = symbol.name;
             document.getElementById('symbol-yesno').textContent = `Yes/No: ${symbol.yesno}`;
             document.getElementById('symbol-fortune').textContent = `吉凶: ${symbol.fortune}`;
@@ -1172,12 +1182,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('symbolDialog').addEventListener('click', (e) => {
-                if (e.target.id === 'symbolDialog') closeSymbolDialog();
-            });
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && document.getElementById('symbolDialog').classList.contains('show')) closeSymbolDialog();
-            });
+            // Escキーでの閉じる機能も削除
         });
 
         document.addEventListener('touchstart', function() {}, {passive: true});
