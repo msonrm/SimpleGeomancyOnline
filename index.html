@@ -927,7 +927,7 @@
                 directionalLight.shadow.radius = 12;
                 scene.add(directionalLight);
                 world = new CANNON.World();
-                world.gravity.set(0, -6.5, 0);
+                world.gravity.set(0, -5, 0);
                 world.broadphase = new CANNON.NaiveBroadphase();
                 const diceMaterial = new CANNON.Material('dice');
                 const floorMaterial = new CANNON.Material('floor');
@@ -1089,7 +1089,7 @@
             const diceBody = new CANNON.Body({ mass: 1, material: diceMaterial, linearDamping: 0.1, angularDamping: 0.1 });
             diceBody.addShape(diceShape);
             diceBody.position.set(pos[0], pos[1], pos[2]);
-            diceBody.angularVelocity.set((Math.random() - 0.5) * 20, (Math.random() - 0.5) * 20, (Math.random() - 0.5) * 20);
+            diceBody.angularVelocity.set((Math.random() - 0.5) * 15, (Math.random() - 0.5) * 15, (Math.random() - 0.5) * 15);
             world.add(diceBody);
             const colors = { fire: 0xffcccc, air: 0xffffcc, water: 0xccddff, earth: 0xccffcc };
             const diceGeometry = createRoundedBoxGeometry(3.0, 3.0, 3.0, 0.3, 8);
