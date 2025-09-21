@@ -137,6 +137,28 @@
             box-shadow: 0 6px 20px rgba(139,115,85,0.4);
         }
 
+        .install-button {
+            display: none;
+            background: #5d4e37;
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 20px auto 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(93,78,55,0.3);
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .install-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(93,78,55,0.4);
+        }
+
         .screen {
             display: none;
         }
@@ -542,6 +564,10 @@
                     ワンオラクル（ダイス）
                 </button>
             </div>
+
+            <button id="install-button" class="install-button">
+                このアプリをインストール
+            </button>
 
             <div class="app-promo-section">
                 <h3 class="info-title">Geomancy Diary アプリ</h3>
