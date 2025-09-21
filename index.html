@@ -1067,7 +1067,7 @@
 
         function createWalls() {
             const wallHeight = 12; // 落下開始位置(6 + 3*0.5 = 7.5)以上の高さに
-            const roomSize = 8;
+            const roomSize = 12; // 部屋を大きくする（8→12）
             
             // 4つの壁を作成
             const wallPositions = [
@@ -1090,13 +1090,13 @@
 
                 // 視覚的な壁（透明で見えない）
                 const wallGeometry = new THREE.BoxGeometry(1, wallHeight, roomSize * 2);
-                const wallMaterial = new THREE.MeshLambertMaterial({ 
+                const wallMaterialThree = new THREE.MeshLambertMaterial({ 
                     color: 0xd4c4a8, 
                     transparent: true, 
                     opacity: 0,  // 完全に透明
                     visible: false  // レンダリングしない
                 });
-                const wallMesh = new THREE.Mesh(wallGeometry, wallMaterial);
+                const wallMesh = new THREE.Mesh(wallGeometry, wallMaterialThree);
                 wallMesh.position.set(pos.x, pos.y, pos.z);
                 if (pos.rotY) {
                     wallMesh.rotation.y = pos.rotY;
