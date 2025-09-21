@@ -899,7 +899,7 @@
                 const height = container.clientHeight;
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color(0xf0f0f0);
-                camera = new THREE.OrthographicCamera(-10, 10, 10, -10, 0.1, 100);
+                camera = new THREE.OrthographicCamera(-10, 10, 10, -10, 0.1, 1000);
                 camera.position.set(0, 20, 0);
                 camera.lookAt(0, 0, 0);
                 renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -944,11 +944,13 @@
             const floorBody = new CANNON.Body({ mass: 0, material: floorMaterial });
             floorBody.addShape(floorShape);
             floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+            floorBody.position.set(0, -6, 0);
             world.add(floorBody);
             const floorGeometry = new THREE.PlaneGeometry(20, 20);
             const floorMaterialThree = new THREE.MeshLambertMaterial({ color: 0xe8dcc6, transparent: true, opacity: 0.8 });
             const floorMesh = new THREE.Mesh(floorGeometry, floorMaterialThree);
             floorMesh.rotation.x = -Math.PI / 2;
+            floorMesh.position.y = -6;
             floorMesh.receiveShadow = true;
             scene.add(floorMesh);
         }
@@ -957,10 +959,10 @@
             const wallHeight = 12;
             const roomSize = 12;
             const wallPositions = [
-                { x: roomSize, y: wallHeight/2, z: 0, rotY: 0 },
-                { x: -roomSize, y: wallHeight/2, z: 0, rotY: 0 },
-                { x: 0, y: wallHeight/2, z: roomSize, rotY: Math.PI/2 },
-                { x: 0, y: wallHeight/2, z: -roomSize, rotY: Math.PI/2 }
+                { x: roomSize, y: wallHeight/2 - 6, z: 0, rotY: 0 },
+                { x: -roomSize, y: wallHeight/2 - 6, z: 0, rotY: 0 },
+                { x: 0, y: wallHeight/2 - 6, z: roomSize, rotY: Math.PI/2 },
+                { x: 0, y: wallHeight/2 - 6, z: -roomSize, rotY: Math.PI/2 }
             ];
             wallPositions.forEach((pos) => {
                 const wallShape = new CANNON.Box(new CANNON.Vec3(0.5, wallHeight/2, roomSize));
@@ -998,7 +1000,7 @@
             clearDice();
             resetDiceResults();
             const elements = ['fire', 'air', 'water', 'earth'];
-            const positions = [[-3, 15, -3], [3, 16, -3], [-3, 17, 3], [3, 18, 3]];
+            const positions = [[-3, 12, -3], [3, 13, -3], [-3, 14, 3], [3, 15, 3]];
             
             for (let i = 0; i < 4; i++) {
                 const pos = positions[i];
@@ -1075,14 +1077,14 @@
         }
 
         function createSingleDice(index, element) {
-            const positions = [[-3, 15, -3], [3, 16, -3], [-3, 17, 3], [3, 18, 3]];
+            const positions = [[-3, 12, -3], [3, 13, -3], [-3, 14, 3], [3, 15, 3]];
             const pos = positions[index];
             const diceShape = new CANNON.Box(new CANNON.Vec3(1.5, 1.5, 1.5));
             const diceMaterial = new CANNON.Material('dice');
             const diceBody = new CANNON.Body({ mass: 1, material: diceMaterial, linearDamping: 0.1, angularDamping: 0.1 });
             diceBody.addShape(diceShape);
             diceBody.position.set(pos[0], pos[1], pos[2]);
-            diceBody.angularVelocity.set((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10);
+            diceBody.angularVelocity.set((Math.random() - 0.5) * 20, (Math.random() - 0.5) * 20, (Math.random() - 0.5) * 20);
             world.add(diceBody);
             const colors = { fire: 0xffcccc, air: 0xffffcc, water: 0xccddff, earth: 0xccffcc };
             const diceGeometry = createRoundedBoxGeometry(3.0, 3.0, 3.0, 0.3, 8);
