@@ -980,37 +980,51 @@
                 container.appendChild(renderer.domElement);
 
                 // ライト
-                const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+                const ambientLight = new THREE.AmbientLight(0x404040, 0.8); // 環境光を強めに
                 scene.add(ambientLight);
 
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-                directionalLight.position.set(-5, 15, 3); // 部屋内の左上から照らす
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6); // 直接光を弱めに
+                directionalLight.position.set(-8, 18, -5); // 左上から照らす（Z座標を負に）
                 directionalLight.castShadow = true;
-                directionalLight.shadow.mapSize.width = 1024;
-                directionalLight.shadow.mapSize.height = 1024;
+                directionalLight.shadow.mapSize.width = 2048; // 影の解像度を上げる
+                directionalLight.shadow.mapSize.height = 2048;
                 directionalLight.shadow.camera.left = -15;
                 directionalLight.shadow.camera.right = 15;
                 directionalLight.shadow.camera.top = 15;
                 directionalLight.shadow.camera.bottom = -15;
+                directionalLight.shadow.radius = 12; // 影を極端にぼかす
                 scene.add(directionalLight);
 
                 // 物理エンジンの初期化
                 world = new CANNON.World();
-                world.gravity.set(0, -4.5, 0); // 重力を弱く（通常の約半分）
+                world.gravity.set(0, -6.5, 0); // 重力を調整（標準の約2/3）
                 world.broadphase = new CANNON.NaiveBroadphase();
                 
-                // 反発係数を設定（ダイス同士が重ならないように）
-                const defaultMaterial = new CANNON.Material('default');
-                const defaultContactMaterial = new CANNON.ContactMaterial(
-                    defaultMaterial,
-                    defaultMaterial,
+                // 反発係数を設定
+                const diceMaterial = new CANNON.Material('dice');
+                const floorMaterial = new CANNON.Material('floor');
+                
+                // ダイス同士の反発（強め）
+                const diceDiceContact = new CANNON.ContactMaterial(
+                    diceMaterial,
+                    diceMaterial,
                     {
-                        friction: 0.3,
-                        restitution: 0.7  // 反発係数を高めに設定
+                        friction: 0.1,
+                        restitution: 1.2  // ダイス同士は強く反発
                     }
                 );
-                world.addContactMaterial(defaultContactMaterial);
-                world.defaultContactMaterial = defaultContactMaterial;
+                world.addContactMaterial(diceDiceContact);
+                
+                // 床とダイスの反発（弱め）
+                const floorDiceContact = new CANNON.ContactMaterial(
+                    floorMaterial,
+                    diceMaterial,
+                    {
+                        friction: 0.4,
+                        restitution: 0.3  // 床との反発は弱く（すぐに静止）
+                    }
+                );
+                world.addContactMaterial(floorDiceContact);
 
                 // 床を作成
                 createFloor();
@@ -1028,20 +1042,24 @@
 
         function createFloor() {
             // 物理エンジンの床
+            const floorMaterial = new CANNON.Material('floor');
             const floorShape = new CANNON.Plane();
-            const floorBody = new CANNON.Body({ mass: 0 });
+            const floorBody = new CANNON.Body({ 
+                mass: 0,
+                material: floorMaterial
+            });
             floorBody.addShape(floorShape);
             floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
             world.add(floorBody);
 
             // 視覚的な床
             const floorGeometry = new THREE.PlaneGeometry(20, 20);
-            const floorMaterial = new THREE.MeshLambertMaterial({ 
+            const floorMaterialThree = new THREE.MeshLambertMaterial({ 
                 color: 0xe8dcc6, 
                 transparent: true, 
                 opacity: 0.8 
             });
-            const floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
+            const floorMesh = new THREE.Mesh(floorGeometry, floorMaterialThree);
             floorMesh.rotation.x = -Math.PI / 2;
             floorMesh.receiveShadow = true;
             scene.add(floorMesh);
@@ -1151,6 +1169,31 @@
             }, 100);
         }
 
+        function createRoundedBoxGeometry(width, height, depth, radius, smoothness) {
+            // 角丸立方体ジオメトリを作成
+            const shape = new THREE.Shape();
+            const eps = 0.00001;
+            const radius0 = radius - eps;
+            
+            shape.absarc(eps, eps, eps, -Math.PI / 2, -Math.PI, true);
+            shape.absarc(eps, height - radius * 2, eps, Math.PI, Math.PI / 2, true);
+            shape.absarc(width - radius * 2, height - radius * 2, eps, Math.PI / 2, 0, true);
+            shape.absarc(width - radius * 2, eps, eps, 0, -Math.PI / 2, true);
+            
+            const geometry = new THREE.ExtrudeGeometry(shape, {
+                depth: depth - radius * 2,
+                bevelEnabled: true,
+                bevelSegments: smoothness,
+                steps: 1,
+                bevelSize: radius0,
+                bevelThickness: radius,
+                curveSegments: smoothness
+            });
+            
+            geometry.center();
+            return geometry;
+        }
+
         function createSingleDice(index, element) {
             // 初期位置を離して配置（重ならないように、より高い位置から）
             const positions = [
@@ -1190,8 +1233,8 @@
                 earth: 0xccffcc    // 薄い緑
             };
 
-            // 視覚的なダイス（3倍大きく）
-            const diceGeometry = new THREE.BoxGeometry(3.0, 3.0, 3.0);
+            // 視覚的なダイス（3倍大きく、角を丸く）
+            const diceGeometry = createRoundedBoxGeometry(3.0, 3.0, 3.0, 0.3, 8);
             const diceMaterialThree = new THREE.MeshLambertMaterial({ color: colors[element] });
             const diceMesh = new THREE.Mesh(diceGeometry, diceMaterialThree);
             diceMesh.castShadow = true;
