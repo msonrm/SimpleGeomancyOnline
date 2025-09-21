@@ -592,7 +592,7 @@
             </div>
             
             <div style="flex: 1; display: flex; flex-direction: column;">
-                <div id="dice-3d-container" style="flex: 1; min-height: 400px; position: relative; background: rgba(255,255,255,0.3); margin: 0 20px; border-radius: 12px;">
+                <div id="dice-3d-container" style="width: 100%; aspect-ratio: 1; max-width: 600px; margin: 0 auto; position: relative; background: rgba(255,255,255,0.3); border-radius: 12px;">
                     <!-- Three.jsキャンバスがここに挿入されます -->
                 </div>
                 
@@ -996,7 +996,7 @@
 
                 // 物理エンジンの初期化
                 world = new CANNON.World();
-                world.gravity.set(0, -9.82, 0);
+                world.gravity.set(0, -4.5, 0); // 重力を弱く（通常の約半分）
                 world.broadphase = new CANNON.NaiveBroadphase();
                 
                 // 反発係数を設定（ダイス同士が重ならないように）
@@ -1152,12 +1152,12 @@
         }
 
         function createSingleDice(index, element) {
-            // 初期位置を離して配置（重ならないように）
+            // 初期位置を離して配置（重ならないように、より高い位置から）
             const positions = [
-                [-3, 8, -3],  // 火
-                [3, 9, -3],   // 風
-                [-3, 10, 3],  // 水
-                [3, 11, 3]    // 地
+                [-3, 15, -3],  // 火
+                [3, 16, -3],   // 風
+                [-3, 17, 3],   // 水
+                [3, 18, 3]     // 地
             ];
             const pos = positions[index];
             
@@ -1167,8 +1167,8 @@
             const diceBody = new CANNON.Body({ 
                 mass: 1,
                 material: diceMaterial,
-                linearDamping: 0.3,  // 空気抵抗
-                angularDamping: 0.3  // 回転抵抗
+                linearDamping: 0.1,  // 空気抵抗を減らす（よりゆっくり減速）
+                angularDamping: 0.1  // 回転抵抗を減らす
             });
             diceBody.addShape(diceShape);
             diceBody.position.set(pos[0], pos[1], pos[2]);
