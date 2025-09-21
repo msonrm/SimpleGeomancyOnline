@@ -1,4 +1,4 @@
-const CACHE_NAME = 'geomancy-v8';
+const CACHE_NAME = 'geomancy-v2';
 const urlsToCache = [
   './',
   './index.html',
@@ -54,6 +54,7 @@ self.addEventListener('install', (event) => {
         ]);
       })
   );
+  // 新しいService Workerをすぐにアクティブ化
   self.skipWaiting();
 });
 
@@ -70,6 +71,7 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
+  // 既存のクライアントも新しいService Workerで制御
   self.clients.claim();
 });
 
@@ -90,4 +92,11 @@ self.addEventListener('fetch', (event) => {
         return caches.match(event.request);
       })
   );
+});
+
+// クライアントにメッセージを送信
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
