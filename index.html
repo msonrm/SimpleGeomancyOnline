@@ -325,6 +325,74 @@
             transform: none;
         }
 
+        /* ダイス結果表示エリア */
+        .dice-results {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 20px 0;
+            padding: 0 20px;
+        }
+
+        .dice-result-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dice-result-box {
+            background: rgba(255,255,255,0.9);
+            border-radius: 8px;
+            padding: 12px;
+            width: 60px;
+            height: 60px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dice-result-box.fire {
+            border-color: #ffaaaa;
+            background: #ffdddd;
+        }
+
+        .dice-result-box.air {
+            border-color: #ffffaa;
+            background: #ffffdd;
+        }
+
+        .dice-result-box.water {
+            border-color: #aaccff;
+            background: #ddeeff;
+        }
+
+        .dice-result-box.earth {
+            border-color: #aaffaa;
+            background: #ddffdd;
+        }
+
+        .element-label {
+            font-size: 11px;
+            color: rgba(93,78,55,0.8);
+            font-weight: 600;
+        }
+
+        .dice-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #5d4e37;
+        }
+
+        .dice-value.empty {
+            color: rgba(93,78,55,0.3);
+            font-size: 16px;
+        }
+
         /* シンボルダイアログ */
         .symbol-dialog {
             position: fixed;
@@ -530,16 +598,38 @@
                 
                 <div style="padding: 16px 20px 20px 20px; text-align: center;">
                     <p style="color: rgba(93,78,55,0.7); font-size: 14px; margin-bottom: 16px; line-height: 1.4;">
-                        ジオマンシー専用の特殊なダイス（1と2の目のみ）を4つ振って、シンボルを生成します。ダイスが止まったら自動的に結果を判定し、ジオマンシーシンボルを表示します。
+                        4つのエレメント（火・風・水・地）を表すダイス（1と2の目のみ）を振って、シンボルを生成します。
                     </p>
-                    <button class="roll-button" id="dice-roll-btn" onclick="initDicePhysics()">ダイスを振る</button>
                     
-                    <!-- デバッグ情報表示エリア -->
-                    <div id="debug-info" style="margin-top: 16px; padding: 12px; background: rgba(0,0,0,0.1); border-radius: 8px; font-size: 12px; color: rgba(93,78,55,0.7); text-align: left;">
-                        <div>Three.js: <span id="three-status">チェック中...</span></div>
-                        <div>Cannon.js: <span id="cannon-status">チェック中...</span></div>
-                        <div>ステータス: <span id="scene-status">初期化待ち</span></div>
+                    <!-- ダイス結果表示エリア -->
+                    <div class="dice-results">
+                        <div class="dice-result-container">
+                            <div class="dice-result-box fire">
+                                <div class="dice-value empty" id="dice-result-0">?</div>
+                            </div>
+                            <div class="element-label">火</div>
+                        </div>
+                        <div class="dice-result-container">
+                            <div class="dice-result-box air">
+                                <div class="dice-value empty" id="dice-result-1">?</div>
+                            </div>
+                            <div class="element-label">風</div>
+                        </div>
+                        <div class="dice-result-container">
+                            <div class="dice-result-box water">
+                                <div class="dice-value empty" id="dice-result-2">?</div>
+                            </div>
+                            <div class="element-label">水</div>
+                        </div>
+                        <div class="dice-result-container">
+                            <div class="dice-result-box earth">
+                                <div class="dice-value empty" id="dice-result-3">?</div>
+                            </div>
+                            <div class="element-label">地</div>
+                        </div>
                     </div>
+                    
+                    <button class="roll-button" id="dice-roll-btn" onclick="initDicePhysics()">ダイスを振る</button>
                 </div>
             </div>
         </div>
@@ -626,9 +716,6 @@
         function showDiceOracle() {
             hideAllScreens();
             document.getElementById('dice-oracle-screen').classList.add('active');
-            
-            // デバッグ情報を更新
-            updateDebugInfo();
             
             // 少し遅らせて3Dシーンを初期化
             setTimeout(() => {
@@ -855,7 +942,6 @@
         function init3DScene() {
             const container = document.getElementById('dice-3d-container');
             if (!container) {
-                updateSceneStatus('コンテナが見つかりません', true);
                 return;
             }
 
@@ -866,21 +952,13 @@
             }
 
             // ライブラリチェック
-            if (!window.THREE) {
-                updateSceneStatus('Three.jsが読み込まれていません', true);
-                return;
-            }
-
-            if (!window.CANNON) {
-                updateSceneStatus('Cannon.jsが読み込まれていません', true);
+            if (!window.THREE || !window.CANNON) {
                 return;
             }
 
             try {
                 const width = container.clientWidth;
                 const height = container.clientHeight;
-
-                updateSceneStatus(`シーン初期化中... (${width}x${height})`);
 
                 // Three.js シーン設定
                 scene = new THREE.Scene();
@@ -906,16 +984,33 @@
                 scene.add(ambientLight);
 
                 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-                directionalLight.position.set(10, 10, 5);
+                directionalLight.position.set(-5, 15, 3); // 部屋内の左上から照らす
                 directionalLight.castShadow = true;
                 directionalLight.shadow.mapSize.width = 1024;
                 directionalLight.shadow.mapSize.height = 1024;
+                directionalLight.shadow.camera.left = -15;
+                directionalLight.shadow.camera.right = 15;
+                directionalLight.shadow.camera.top = 15;
+                directionalLight.shadow.camera.bottom = -15;
                 scene.add(directionalLight);
 
                 // 物理エンジンの初期化
                 world = new CANNON.World();
                 world.gravity.set(0, -9.82, 0);
                 world.broadphase = new CANNON.NaiveBroadphase();
+                
+                // 反発係数を設定（ダイス同士が重ならないように）
+                const defaultMaterial = new CANNON.Material('default');
+                const defaultContactMaterial = new CANNON.ContactMaterial(
+                    defaultMaterial,
+                    defaultMaterial,
+                    {
+                        friction: 0.3,
+                        restitution: 0.7  // 反発係数を高めに設定
+                    }
+                );
+                world.addContactMaterial(defaultContactMaterial);
+                world.defaultContactMaterial = defaultContactMaterial;
 
                 // 床を作成
                 createFloor();
@@ -923,13 +1018,11 @@
                 // 壁を作成
                 createWalls();
 
-                updateSceneStatus('3Dシーン初期化完了 ✓');
-
                 // アニメーションループ開始
                 animate3D();
 
             } catch (error) {
-                updateSceneStatus(`エラー: ${error.message}`, true);
+                console.error('3Dシーン初期化エラー:', error);
             }
         }
 
@@ -955,7 +1048,7 @@
         }
 
         function createWalls() {
-            const wallHeight = 3;
+            const wallHeight = 12; // 落下開始位置(6 + 3*0.5 = 7.5)以上の高さに
             const roomSize = 8;
             
             // 4つの壁を作成
@@ -977,20 +1070,21 @@
                 }
                 world.add(wallBody);
 
-                // 視覚的な壁
+                // 視覚的な壁（透明で見えない）
                 const wallGeometry = new THREE.BoxGeometry(1, wallHeight, roomSize * 2);
                 const wallMaterial = new THREE.MeshLambertMaterial({ 
                     color: 0xd4c4a8, 
                     transparent: true, 
-                    opacity: 0.7 
+                    opacity: 0,  // 完全に透明
+                    visible: false  // レンダリングしない
                 });
                 const wallMesh = new THREE.Mesh(wallGeometry, wallMaterial);
                 wallMesh.position.set(pos.x, pos.y, pos.z);
                 if (pos.rotY) {
                     wallMesh.rotation.y = pos.rotY;
                 }
-                wallMesh.castShadow = true;
-                wallMesh.receiveShadow = true;
+                wallMesh.castShadow = false;  // 壁は影を落とさない
+                wallMesh.receiveShadow = false;
                 scene.add(wallMesh);
             });
         }
@@ -1009,11 +1103,8 @@
 
         function initDicePhysics() {
             if (!world || !scene) {
-                updateSceneStatus('物理エンジンが初期化されていません', true);
                 return;
             }
-            
-            updateSceneStatus('ジオマンシーダイスを振っています...');
             
             // ジオマンシーダイスを作成・振る
             createGeomancyDice();
@@ -1023,32 +1114,64 @@
             // 既存のダイスをクリア
             clearDice();
             
-            updateSceneStatus('ジオマンシーダイス生成中...');
+            // 結果表示をリセット
+            resetDiceResults();
             
-            // 4つのダイスを作成
+            // 4つのダイスを作成（火・風・水・地の順）
+            const elements = ['fire', 'air', 'water', 'earth'];
             for (let i = 0; i < 4; i++) {
-                const dice = createSingleDice(i);
+                const dice = createSingleDice(i, elements[i]);
                 diceObjects.push(dice);
             }
             
-            updateSceneStatus('4つのジオマンシーダイスを生成しました ✓');
-            
-            // 2秒後に結果を判定
-            setTimeout(() => {
-                calculateDiceResults();
-            }, 3000);
+            // ダイスが完全に静止するまで待つ
+            checkDiceSettled();
         }
 
-        function createSingleDice(index) {
-            // ランダムな初期位置（少し分散させる）
-            const x = (Math.random() - 0.5) * 4;
-            const z = (Math.random() - 0.5) * 4;
+        function checkDiceSettled() {
+            const checkInterval = setInterval(() => {
+                let allSettled = true;
+                
+                diceObjects.forEach(dice => {
+                    const velocity = dice.body.velocity.length();
+                    const angularVelocity = dice.body.angularVelocity.length();
+                    
+                    // 速度がほぼゼロになったか確認（閾値を小さく）
+                    if (velocity > 0.01 || angularVelocity > 0.01) {
+                        allSettled = false;
+                    }
+                });
+                
+                if (allSettled) {
+                    clearInterval(checkInterval);
+                    setTimeout(() => {
+                        calculateDiceResults();
+                    }, 500);
+                }
+            }, 100);
+        }
+
+        function createSingleDice(index, element) {
+            // 初期位置を離して配置（重ならないように）
+            const positions = [
+                [-3, 8, -3],  // 火
+                [3, 9, -3],   // 風
+                [-3, 10, 3],  // 水
+                [3, 11, 3]    // 地
+            ];
+            const pos = positions[index];
             
-            // 物理エンジンのダイス
-            const diceShape = new CANNON.Box(new CANNON.Vec3(0.4, 0.4, 0.4));
-            const diceBody = new CANNON.Body({ mass: 1 });
+            // 物理エンジンのダイス（3倍大きく）
+            const diceShape = new CANNON.Box(new CANNON.Vec3(1.5, 1.5, 1.5));
+            const diceMaterial = new CANNON.Material('dice');
+            const diceBody = new CANNON.Body({ 
+                mass: 1,
+                material: diceMaterial,
+                linearDamping: 0.3,  // 空気抵抗
+                angularDamping: 0.3  // 回転抵抗
+            });
             diceBody.addShape(diceShape);
-            diceBody.position.set(x, 6 + index * 0.5, z);
+            diceBody.position.set(pos[0], pos[1], pos[2]);
             
             // ランダムな回転を追加
             diceBody.angularVelocity.set(
@@ -1059,10 +1182,18 @@
             
             world.add(diceBody);
 
-            // 視覚的なダイス（白いダイス）
-            const diceGeometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
-            const diceMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
-            const diceMesh = new THREE.Mesh(diceGeometry, diceMaterial);
+            // エレメントに応じた薄い色
+            const colors = {
+                fire: 0xffcccc,    // 薄い赤
+                air: 0xffffcc,     // 薄い黄
+                water: 0xccddff,   // 薄い青
+                earth: 0xccffcc    // 薄い緑
+            };
+
+            // 視覚的なダイス（3倍大きく）
+            const diceGeometry = new THREE.BoxGeometry(3.0, 3.0, 3.0);
+            const diceMaterialThree = new THREE.MeshLambertMaterial({ color: colors[element] });
+            const diceMesh = new THREE.Mesh(diceGeometry, diceMaterialThree);
             diceMesh.castShadow = true;
             diceMesh.receiveShadow = true;
             scene.add(diceMesh);
@@ -1074,7 +1205,8 @@
             const diceObject = {
                 body: diceBody,
                 mesh: diceMesh,
-                id: index
+                id: index,
+                element: element
             };
 
             // 物理エンジンとビジュアルを同期
@@ -1096,53 +1228,85 @@
         }
 
         function createDiceDots(diceMesh) {
-            // ダイスの各面に1または2の目を描画
-            const dotGeometry = new THREE.SphereGeometry(0.06, 8, 8);
-            const dotMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
+            // ダイスの各面に1または2の目を描画（平面的な円形）
+            const dotGeometry = new THREE.CircleGeometry(0.24, 16);
+            const dotMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0x333333,
+                side: THREE.DoubleSide
+            }); // 黒い目（平面）
 
-            // 各面の中心座標（ローカル座標）
+            // 各面の目の数を固定パターンで決定（対面が異なる値になるように）
+            const faceValues = [
+                1, // 0: 右面 (+X)
+                2, // 1: 左面 (-X)
+                1, // 2: 上面 (+Y)
+                2, // 3: 下面 (-Y)
+                1, // 4: 前面 (+Z)
+                2  // 5: 後面 (-Z)
+            ];
+            
+            // ダイスメッシュに面の値を保存
+            diceMesh.userData.faceValues = faceValues;
+
+            // 各面の中心座標と向き（ローカル座標、3倍のサイズに合わせて）
             const faces = [
-                { normal: [1, 0, 0], center: [0.41, 0, 0] },   // 右面
-                { normal: [-1, 0, 0], center: [-0.41, 0, 0] }, // 左面
-                { normal: [0, 1, 0], center: [0, 0.41, 0] },   // 上面
-                { normal: [0, -1, 0], center: [0, -0.41, 0] }, // 下面
-                { normal: [0, 0, 1], center: [0, 0, 0.41] },   // 前面
-                { normal: [0, 0, -1], center: [0, 0, -0.41] }  // 後面
+                { normal: [1, 0, 0], center: [1.51, 0, 0], rotation: [0, Math.PI/2, 0], index: 0 },   // 右面 (+X)
+                { normal: [-1, 0, 0], center: [-1.51, 0, 0], rotation: [0, -Math.PI/2, 0], index: 1 }, // 左面 (-X)
+                { normal: [0, 1, 0], center: [0, 1.51, 0], rotation: [-Math.PI/2, 0, 0], index: 2 },   // 上面 (+Y)
+                { normal: [0, -1, 0], center: [0, -1.51, 0], rotation: [Math.PI/2, 0, 0], index: 3 }, // 下面 (-Y)
+                { normal: [0, 0, 1], center: [0, 0, 1.51], rotation: [0, 0, 0], index: 4 },   // 前面 (+Z)
+                { normal: [0, 0, -1], center: [0, 0, -1.51], rotation: [0, Math.PI, 0], index: 5 }  // 後面 (-Z)
             ];
 
-            faces.forEach((face, faceIndex) => {
-                // 各面に1または2の目をランダムに配置
-                const dotCount = Math.random() < 0.5 ? 1 : 2;
+            faces.forEach((face) => {
+                // この面の目の数を取得
+                const dotCount = faceValues[face.index];
                 
                 if (dotCount === 1) {
                     // 1つの目（中央）
                     const dot = new THREE.Mesh(dotGeometry, dotMaterial);
                     dot.position.set(face.center[0], face.center[1], face.center[2]);
+                    dot.rotation.set(face.rotation[0], face.rotation[1], face.rotation[2]);
                     diceMesh.add(dot);
                 } else {
-                    // 2つの目（対角線上）
+                    // 2つの目（対角線上、3倍のサイズに合わせて）
                     const positions = [
-                        [face.center[0] - 0.15, face.center[1] - 0.15, face.center[2]],
-                        [face.center[0] + 0.15, face.center[1] + 0.15, face.center[2]]
+                        [face.center[0] - 0.6, face.center[1] - 0.6, face.center[2]],
+                        [face.center[0] + 0.6, face.center[1] + 0.6, face.center[2]]
                     ];
                     
                     if (face.normal[0] !== 0) {
                         // X軸面の場合、Y-Z平面上に配置
-                        positions[0] = [face.center[0], face.center[1] - 0.15, face.center[2] - 0.15];
-                        positions[1] = [face.center[0], face.center[1] + 0.15, face.center[2] + 0.15];
+                        positions[0] = [face.center[0], face.center[1] - 0.6, face.center[2] - 0.6];
+                        positions[1] = [face.center[0], face.center[1] + 0.6, face.center[2] + 0.6];
                     } else if (face.normal[1] !== 0) {
                         // Y軸面の場合、X-Z平面上に配置
-                        positions[0] = [face.center[0] - 0.15, face.center[1], face.center[2] - 0.15];
-                        positions[1] = [face.center[0] + 0.15, face.center[1], face.center[2] + 0.15];
+                        positions[0] = [face.center[0] - 0.6, face.center[1], face.center[2] - 0.6];
+                        positions[1] = [face.center[0] + 0.6, face.center[1], face.center[2] + 0.6];
                     }
                     
                     positions.forEach(pos => {
                         const dot = new THREE.Mesh(dotGeometry, dotMaterial);
                         dot.position.set(pos[0], pos[1], pos[2]);
+                        dot.rotation.set(face.rotation[0], face.rotation[1], face.rotation[2]);
                         diceMesh.add(dot);
                     });
                 }
             });
+        }
+
+        function resetDiceResults() {
+            for (let i = 0; i < 4; i++) {
+                const resultElement = document.getElementById(`dice-result-${i}`);
+                resultElement.textContent = '?';
+                resultElement.classList.add('empty');
+            }
+        }
+
+        function updateDiceResult(index, value) {
+            const resultElement = document.getElementById(`dice-result-${index}`);
+            resultElement.textContent = value;
+            resultElement.classList.remove('empty');
         }
 
         function clearDice() {
@@ -1162,46 +1326,53 @@
             diceResults = [];
             
             diceObjects.forEach((dice, index) => {
-                // ダイスの上面を判定（Y軸の正の方向）
+                // ダイスの上面を判定（Y軸の正の方向 = 上）
                 const upVector = new THREE.Vector3(0, 1, 0);
-                upVector.applyQuaternion(dice.mesh.quaternion);
                 
-                // どの面が上を向いているかを判定
-                const faces = [
-                    { normal: [1, 0, 0], value: 1 },   // 右面
-                    { normal: [-1, 0, 0], value: 2 },  // 左面
-                    { normal: [0, 1, 0], value: 1 },   // 上面
-                    { normal: [0, -1, 0], value: 2 },  // 下面
-                    { normal: [0, 0, 1], value: 1 },   // 前面
-                    { normal: [0, 0, -1], value: 2 }   // 後面
+                // 各面の法線ベクトル（ローカル座標）
+                const faceNormals = [
+                    new THREE.Vector3(1, 0, 0),   // 0: 右面 (+X)
+                    new THREE.Vector3(-1, 0, 0),  // 1: 左面 (-X)
+                    new THREE.Vector3(0, 1, 0),   // 2: 上面 (+Y)
+                    new THREE.Vector3(0, -1, 0),  // 3: 下面 (-Y)
+                    new THREE.Vector3(0, 0, 1),   // 4: 前面 (+Z)
+                    new THREE.Vector3(0, 0, -1)   // 5: 後面 (-Z)
                 ];
                 
                 let maxDot = -1;
-                let result = 1;
+                let topFaceIndex = 0;
                 
-                faces.forEach(face => {
-                    const faceVector = new THREE.Vector3(face.normal[0], face.normal[1], face.normal[2]);
-                    const dot = upVector.dot(faceVector);
+                // 各面の法線をダイスの回転に合わせて変換し、上向きベクトルとの内積を計算
+                faceNormals.forEach((faceNormal, faceIndex) => {
+                    // 面の法線をダイスの回転で変換
+                    const rotatedNormal = faceNormal.clone();
+                    rotatedNormal.applyQuaternion(dice.mesh.quaternion);
+                    
+                    // 上向きベクトルとの内積（大きいほど上を向いている）
+                    const dot = upVector.dot(rotatedNormal);
+                    
                     if (dot > maxDot) {
                         maxDot = dot;
-                        result = face.value;
+                        topFaceIndex = faceIndex;
                     }
                 });
                 
+                // 上を向いている面の値を取得
+                const result = dice.mesh.userData.faceValues[topFaceIndex];
                 diceResults.push(result);
+                
+                // 結果表示を更新
+                updateDiceResult(index, result);
             });
-            
-            updateSceneStatus(`ダイス結果: ${diceResults.join(', ')}`);
             
             // 結果からジオマンシーシンボルを生成
             setTimeout(() => {
                 generateSymbolFromDice();
-            }, 1000);
+            }, 1500);
         }
 
         function generateSymbolFromDice() {
             if (diceResults.length !== 4) {
-                updateSceneStatus('ダイス結果が不完全です', true);
                 return;
             }
             
@@ -1221,8 +1392,6 @@
             
             // ダイアログを表示
             document.getElementById('symbolDialog').classList.add('show');
-            
-            updateSceneStatus('ジオマンシーシンボル生成完了 ✓');
         }
 
         function showAppPromo() {
