@@ -150,6 +150,47 @@
             box-shadow: 0 6px 20px rgba(139,115,85,0.4);
         }
 
+        .install-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(93,78,55,0.4);
+        }
+
+        .update-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #5d4e37;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 1001;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        .update-banner.show {
+            display: block;
+        }
+
+        .update-button {
+            background: white;
+            color: #5d4e37;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .update-button:hover {
+            transform: scale(1.05);
+        }
+
         .screen {
             display: none;
         }
