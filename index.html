@@ -475,6 +475,12 @@
             border: 1px solid rgba(139,115,85,0.2);
         }
 
+        .symbol-image {
+            max-width: 100%;
+            height: auto;
+            max-height: 200px;
+        }
+
         .symbol-placeholder {
             font-size: 48px;
             font-family: monospace;
@@ -489,6 +495,23 @@
             color: #5d4e37;
             text-align: center;
             margin-bottom: 16px;
+        }
+
+        .symbol-attributes {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .symbol-attribute {
+            background: rgba(139,115,85,0.1);
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #5d4e37;
+            font-weight: 500;
         }
 
         .symbol-meaning {
@@ -645,17 +668,20 @@
             
             <div class="symbol-body">
                 <div class="symbol-image-area">
-                    <div class="symbol-placeholder" id="symbol-image">
-                        •<br>••<br>•<br>••
-                    </div>
+                    <img class="symbol-image" id="symbol-image" src="1212.png" alt="シンボル">
                 </div>
                 
                 <div class="symbol-name" id="symbol-name">
-                    フォルトゥナ・マイナー（Fortuna Minor）
+                    Fortuna Minor（小吉）
+                </div>
+                
+                <div class="symbol-attributes">
+                    <div class="symbol-attribute" id="symbol-yesno">Yes/No: イエス</div>
+                    <div class="symbol-attribute" id="symbol-fortune">吉凶: 小吉</div>
                 </div>
                 
                 <div class="symbol-meaning" id="symbol-meaning">
-                    小さな幸運・内なる力。自分自身の力で道を切り開く時期です。困難な状況でも、あなたの内に秘められた力と意志の強さが道を照らします。
+                    小さく一時的な幸運、ささやかな幸せ。周りからの援助。
                 </div>
             </div>
         </div>
@@ -689,22 +715,118 @@
 
         // ジオマンシーのシンボル定義（16種類）
         const geomancySymbols = {
-            '1111': { name: 'ヴィア（Via）', meaning: '道・旅・変化への導き。新しい始まりと前進のエネルギーが示されています。', symbol: '•\n•\n•\n•' },
-            '2222': { name: 'ポプルス（Populus）', meaning: '人々・集団・社会との調和。周囲との関係性を大切にする時期です。', symbol: '••\n••\n••\n••' },
-            '1122': { name: 'コニュンクティオ（Coniunctio）', meaning: '結合・調和・統一。対立していたものが一つになる兆しです。', symbol: '•\n•\n••\n••' },
-            '2211': { name: 'カルサー（Carcer）', meaning: '監獄・制限・束縛。一時的な制限の中で内面を見つめる時です。', symbol: '••\n••\n•\n•' },
-            '1212': { name: 'フォルトゥナ・マイナー（Fortuna Minor）', meaning: '小さな幸運・内なる力。自分自身の力で道を切り開く時期です。', symbol: '•\n••\n•\n••' },
-            '2121': { name: 'フォルトゥナ・マイユール（Fortuna Maior）', meaning: '大きな幸運・外なる力。外部からの支援や好機が訪れます。', symbol: '••\n•\n••\n•' },
-            '1221': { name: 'ラエティシア（Laetitia）', meaning: '喜び・楽しさ・満足。心の平安と充実感に満たされる時です。', symbol: '•\n••\n••\n•' },
-            '2112': { name: 'トリスティシア（Tristitia）', meaning: '悲しみ・憂鬱・困難。試練を通じて成長する大切な学びの時期です。', symbol: '••\n•\n•\n••' },
-            '1211': { name: 'カプト・ドラコニス（Caput Draconis）', meaning: '龍の頭・始まり・入口。新たなサイクルの始まりを告げています。', symbol: '•\n••\n•\n•' },
-            '2122': { name: 'カウダ・ドラコニス（Cauda Draconis）', meaning: '龍の尻尾・終わり・出口。一つの段階の完了と次への移行の時です。', symbol: '••\n•\n••\n••' },
-            '1112': { name: 'ピューエル（Puer）', meaning: '少年・衝動・行動。情熱的なエネルギーで積極的に行動する時です。', symbol: '•\n•\n•\n••' },
-            '2221': { name: 'プエラ（Puella）', meaning: '少女・受容・美。優雅さと受容性で物事を迎え入れる時です。', symbol: '••\n••\n••\n•' },
-            '2111': { name: 'アミッシオ（Amissio）', meaning: '失うもの・損失・手放し。手放すことで新しい可能性が生まれます。', symbol: '••\n•\n•\n•' },
-            '1222': { name: 'アクイジティオ（Acquisitio）', meaning: '得るもの・獲得・受け取り。努力の成果や新しい恵みを受け取る時です。', symbol: '•\n••\n••\n••' },
-            '2211': { name: 'ルベウス（Rubeus）', meaning: '赤・情熱・危険。強い感情に注意深く向き合う必要があります。', symbol: '••\n••\n•\n•' },
-            '1122': { name: 'アルブス（Albus）', meaning: '白・純粋・平和。清らかな心で物事を見つめ直す時期です。', symbol: '•\n•\n••\n••' }
+            '2222': { 
+                name: 'Populus（人々）', 
+                meaning: '物事や人が多数ある状態。受け身。安定。', 
+                symbol: '••\n••\n••\n••',
+                yesno: 'イエス',
+                fortune: '吉'
+            },
+            '1111': { 
+                name: 'Via（道）', 
+                meaning: '変化、動くこと、過程。決断。積極性、能動性。', 
+                symbol: '•\n•\n•\n•',
+                yesno: 'ノー',
+                fortune: '吉でも凶でもない。旅や移動について吉'
+            },
+            '2112': { 
+                name: 'Conjunctio（つながり）', 
+                meaning: '違う者同士結びつく、目的を持って集まる、絆が生まれる。失せ物が見つかる。', 
+                symbol: '••\n•\n•\n••',
+                yesno: 'イエス',
+                fortune: '吉と凶の両方'
+            },
+            '1221': { 
+                name: 'Carcer（拘束）', 
+                meaning: '孤独、身動きが取れない、ひきこもり。停滞、現状維持。', 
+                symbol: '•\n••\n••\n•',
+                yesno: 'ノー',
+                fortune: '凶。セキュリティに関しては吉'
+            },
+            '2211': { 
+                name: 'Fortuna Major（大吉）', 
+                meaning: '大きな幸運。自分の思い通りにことが運ぶ。', 
+                symbol: '••\n••\n•\n•',
+                yesno: 'イエス',
+                fortune: '大吉'
+            },
+            '1122': { 
+                name: 'Fortuna Minor（小吉）', 
+                meaning: '小さく一時的な幸運、ささやかな幸せ。周りからの援助。', 
+                symbol: '•\n•\n••\n••',
+                yesno: 'イエス',
+                fortune: '小吉'
+            },
+            '2121': { 
+                name: 'Acquisitio（獲得）', 
+                meaning: '収穫、利益。願いが叶う。何かを受け取る、受け入れる。', 
+                symbol: '••\n•\n••\n•',
+                yesno: 'イエス',
+                fortune: '吉'
+            },
+            '1212': { 
+                name: 'Amissio（喪失）', 
+                meaning: '損失、愛情や金銭などを失う。病気やトラブル、悪癖がなくなる。', 
+                symbol: '•\n••\n•\n••',
+                yesno: 'ノー',
+                fortune: '凶'
+            },
+            '1222': { 
+                name: 'Laetitia（喜び）', 
+                meaning: '喜ばしいこと、笑い、成功。音楽や踊り。髭のある男性。', 
+                symbol: '•\n••\n••\n••',
+                yesno: 'イエス',
+                fortune: '吉'
+            },
+            '2221': { 
+                name: 'Tristitia（悲しみ）', 
+                meaning: '不幸、受難、宿命。', 
+                symbol: '••\n••\n••\n•',
+                yesno: 'ノー',
+                fortune: '凶。占いや魔術に関しては吉'
+            },
+            '1211': { 
+                name: 'Puella（少女）', 
+                meaning: '女性らしさ、美しさ。ときめき、嬉しさ。目先の楽しみ。', 
+                symbol: '•\n••\n•\n•',
+                yesno: 'イエス',
+                fortune: '吉'
+            },
+            '1121': { 
+                name: 'Puer（少年）', 
+                meaning: '男性らしさ、力強さ、未熟さ。未来を切り開く。', 
+                symbol: '•\n•\n••\n•',
+                yesno: 'ノー',
+                fortune: '凶。争い事には吉'
+            },
+            '2212': { 
+                name: 'Albus（白）', 
+                meaning: '公正、高潔さ、正義。片思いやプラトニック・ラブ。', 
+                symbol: '••\n••\n•\n••',
+                yesno: 'イエス',
+                fortune: '吉'
+            },
+            '2122': { 
+                name: 'Rubeus（赤）', 
+                meaning: '争い事、闘争心。悪いことには吉、良いことには凶。', 
+                symbol: '••\n•\n••\n••',
+                yesno: 'ノー',
+                fortune: '凶'
+            },
+            '2111': { 
+                name: 'Caput Draconis（竜の頭）', 
+                meaning: '始まり、新しい扉が開く、前例のない課題に取り組む。やりすぎの傾向。', 
+                symbol: '••\n•\n•\n•',
+                yesno: 'イエス',
+                fortune: '吉凶入り混じる。何かを始めるには吉'
+            },
+            '1112': { 
+                name: 'Cauda Draconis（竜の尾）', 
+                meaning: '終わり、物事の完成、途絶。吉は凶となり、凶は吉となる。', 
+                symbol: '•\n•\n•\n••',
+                yesno: 'ノー',
+                fortune: '吉でも凶でもない。何かを終わらせるには吉'
+            }
         };
 
         function showDotOracle() {
@@ -717,7 +839,6 @@
             hideAllScreens();
             document.getElementById('dice-oracle-screen').classList.add('active');
             
-            // 少し遅らせて3Dシーンを初期化
             setTimeout(() => {
                 init3DScene();
             }, 100);
@@ -737,11 +858,9 @@
             zoneDots = [[], [], [], []];
             for (let i = 0; i < 4; i++) {
                 const zoneElement = document.getElementById(`zone-${i}`);
-                // ドットを削除
                 const dots = zoneElement.querySelectorAll('.dot');
                 dots.forEach(dot => dot.remove());
                 
-                // キャンバスをクリア
                 const canvas = document.getElementById(`canvas-${i}`);
                 const ctx = canvas.getContext('2d');
                 canvas.width = canvas.offsetWidth;
@@ -758,7 +877,6 @@
             const zoneElement = document.getElementById(`zone-${zoneIndex}`);
             const rect = zoneElement.getBoundingClientRect();
             
-            // タップ座標を取得（領域内の相対座標）
             const x = ((event.clientX - rect.left) / rect.width) * 100;
             const y = ((event.clientY - rect.top) / rect.height) * 100;
             
@@ -774,7 +892,6 @@
                 const zoneElement = document.getElementById(`zone-${zoneIndex}`);
                 const rect = zoneElement.getBoundingClientRect();
                 
-                // タッチ座標を取得（領域内の相対座標）
                 const x = ((touch.clientX - rect.left) / rect.width) * 100;
                 const y = ((touch.clientY - rect.top) / rect.height) * 100;
                 
@@ -783,16 +900,12 @@
         }
 
         function addDot(zoneIndex, x, y) {
-            // 生成中は新しいドットを追加しない
             if (isGenerating) return;
             
-            // 境界チェック
             if (x < 0 || x > 100 || y < 0 || y > 100) return;
             
-            // ドット座標を保存
             zoneDots[zoneIndex].push({ x, y });
             
-            // ドットを表示
             const zoneElement = document.getElementById(`zone-${zoneIndex}`);
             const dot = document.createElement('div');
             dot.className = 'dot';
@@ -800,7 +913,6 @@
             dot.style.top = `${y}%`;
             zoneElement.appendChild(dot);
             
-            // キャンバスサイズを更新
             const canvas = document.getElementById(`canvas-${zoneIndex}`);
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
@@ -825,49 +937,42 @@
             const generateBtn = document.getElementById('generate-btn');
             if (!generateBtn.classList.contains('active') || isGenerating) return;
             
-            // 即座にタップ処理を無効化
             isGenerating = true;
             generateBtn.classList.remove('active');
             generateBtn.textContent = '生成中...';
             
-            // 各ゾーンのドットをペアリング
             for (let i = 0; i < 4; i++) {
                 animatePairing(i);
             }
             
-            // 線が引かれてから間を置いてダイアログ表示
             setTimeout(() => {
                 showSymbolDialog();
             }, 2000);
         }
 
         function showSymbolDialog() {
-            // 各ゾーンの偶奇を計算
             const pattern = zoneDots.map(zone => {
                 return zone.length % 2 === 0 ? '2' : '1';
             }).join('');
             
-            // シンボルを取得
             let symbol = geomancySymbols[pattern];
             if (!symbol) {
                 const keys = Object.keys(geomancySymbols);
                 symbol = geomancySymbols[keys[0]];
             }
             
-            // ダイアログの内容を更新
-            document.getElementById('symbol-image').innerHTML = symbol.symbol.replace(/\n/g, '<br>');
+            document.getElementById('symbol-image').src = `${pattern}.png`;
             document.getElementById('symbol-name').textContent = symbol.name;
+            document.getElementById('symbol-yesno').textContent = `Yes/No: ${symbol.yesno}`;
+            document.getElementById('symbol-fortune').textContent = `吉凶: ${symbol.fortune}`;
             document.getElementById('symbol-meaning').textContent = symbol.meaning;
             
-            // ダイアログを表示
             document.getElementById('symbolDialog').classList.add('show');
         }
 
         function closeSymbolDialog() {
-            // ダイアログを非表示
             document.getElementById('symbolDialog').classList.remove('show');
             
-            // リセット
             setTimeout(() => {
                 resetDotOracle();
                 isGenerating = false;
@@ -882,17 +987,12 @@
             const dots = zoneElement.querySelectorAll('.dot');
             const dotCoords = zoneDots[zoneIndex];
             
-            // キャンバスのサイズを設定
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
             
-            // ドットを2つずつペアにする
             for (let i = 0; i < dots.length; i += 2) {
                 setTimeout(() => {
                     if (i + 1 < dots.length) {
-                        // ペア（ドットの色は変更しない）
-                        
-                        // キャンバスで線を描画
                         const x1 = (dotCoords[i].x / 100) * canvas.width;
                         const y1 = (dotCoords[i].y / 100) * canvas.height;
                         const x2 = (dotCoords[i + 1].x / 100) * canvas.width;
@@ -904,39 +1004,9 @@
                         ctx.moveTo(x1, y1);
                         ctx.lineTo(x2, y2);
                         ctx.stroke();
-                    } else {
-                        // 余りの1つ（色は変更しない）
                     }
                 }, i * 100);
             }
-        }
-
-        function updateDebugInfo() {
-            // Three.js の状況をチェック
-            const threeStatus = document.getElementById('three-status');
-            if (window.THREE) {
-                threeStatus.textContent = '読み込み完了 ✓';
-                threeStatus.style.color = '#4CAF50';
-            } else {
-                threeStatus.textContent = '読み込み失敗 ✗';
-                threeStatus.style.color = '#f44336';
-            }
-            
-            // Cannon.js の状況をチェック
-            const cannonStatus = document.getElementById('cannon-status');
-            if (window.CANNON) {
-                cannonStatus.textContent = '読み込み完了 ✓';
-                cannonStatus.style.color = '#4CAF50';
-            } else {
-                cannonStatus.textContent = '読み込み失敗 ✗';
-                cannonStatus.style.color = '#f44336';
-            }
-        }
-
-        function updateSceneStatus(status, isError = false) {
-            const sceneStatus = document.getElementById('scene-status');
-            sceneStatus.textContent = status;
-            sceneStatus.style.color = isError ? '#f44336' : '#4CAF50';
         }
 
         function init3DScene() {
@@ -945,13 +1015,11 @@
                 return;
             }
 
-            // 既存のキャンバスがあれば削除
             const existingCanvas = container.querySelector('canvas');
             if (existingCanvas) {
                 existingCanvas.remove();
             }
 
-            // ライブラリチェック
             if (!window.THREE || !window.CANNON) {
                 return;
             }
@@ -960,18 +1028,15 @@
                 const width = container.clientWidth;
                 const height = container.clientHeight;
 
-                // Three.js シーン設定
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color(0xf0f0f0);
 
-                // カメラ（上から見下ろす視点）
                 camera = new THREE.OrthographicCamera(
                     -10, 10, 10, -10, 0.1, 100
                 );
                 camera.position.set(0, 20, 0);
                 camera.lookAt(0, 0, 0);
 
-                // レンダラー
                 renderer = new THREE.WebGLRenderer({ antialias: true });
                 renderer.setSize(width, height);
                 renderer.shadowMap.enabled = true;
@@ -979,60 +1044,50 @@
                 renderer.domElement.style.borderRadius = '12px';
                 container.appendChild(renderer.domElement);
 
-                // ライト
-                const ambientLight = new THREE.AmbientLight(0x404040, 0.8); // 環境光を強めに
+                const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
                 scene.add(ambientLight);
 
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6); // 直接光を弱めに
-                directionalLight.position.set(-8, 18, -5); // 左上から照らす（Z座標を負に）
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+                directionalLight.position.set(-8, 18, -5);
                 directionalLight.castShadow = true;
-                directionalLight.shadow.mapSize.width = 2048; // 影の解像度を上げる
+                directionalLight.shadow.mapSize.width = 2048;
                 directionalLight.shadow.mapSize.height = 2048;
                 directionalLight.shadow.camera.left = -15;
                 directionalLight.shadow.camera.right = 15;
                 directionalLight.shadow.camera.top = 15;
                 directionalLight.shadow.camera.bottom = -15;
-                directionalLight.shadow.radius = 12; // 影を極端にぼかす
+                directionalLight.shadow.radius = 12;
                 scene.add(directionalLight);
 
-                // 物理エンジンの初期化
                 world = new CANNON.World();
-                world.gravity.set(0, -6.5, 0); // 重力を調整（標準の約2/3）
+                world.gravity.set(0, -6.5, 0);
                 world.broadphase = new CANNON.NaiveBroadphase();
                 
-                // 反発係数を設定
                 const diceMaterial = new CANNON.Material('dice');
                 const floorMaterial = new CANNON.Material('floor');
                 
-                // ダイス同士の反発（強め）
                 const diceDiceContact = new CANNON.ContactMaterial(
                     diceMaterial,
                     diceMaterial,
                     {
                         friction: 0.1,
-                        restitution: 1.2  // ダイス同士は強く反発
+                        restitution: 1.2
                     }
                 );
                 world.addContactMaterial(diceDiceContact);
                 
-                // 床とダイスの反発（弱め）
                 const floorDiceContact = new CANNON.ContactMaterial(
                     floorMaterial,
                     diceMaterial,
                     {
                         friction: 0.4,
-                        restitution: 0.3  // 床との反発は弱く（すぐに静止）
+                        restitution: 0.3
                     }
                 );
                 world.addContactMaterial(floorDiceContact);
 
-                // 床を作成
                 createFloor();
-                
-                // 壁を作成
                 createWalls();
-
-                // アニメーションループ開始
                 animate3D();
 
             } catch (error) {
@@ -1041,7 +1096,6 @@
         }
 
         function createFloor() {
-            // 物理エンジンの床
             const floorMaterial = new CANNON.Material('floor');
             const floorShape = new CANNON.Plane();
             const floorBody = new CANNON.Body({ 
@@ -1052,7 +1106,6 @@
             floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
             world.add(floorBody);
 
-            // 視覚的な床
             const floorGeometry = new THREE.PlaneGeometry(20, 20);
             const floorMaterialThree = new THREE.MeshLambertMaterial({ 
                 color: 0xe8dcc6, 
@@ -1066,19 +1119,17 @@
         }
 
         function createWalls() {
-            const wallHeight = 12; // 落下開始位置(6 + 3*0.5 = 7.5)以上の高さに
-            const roomSize = 12; // 部屋を大きくする（8→12）
+            const wallHeight = 12;
+            const roomSize = 12;
             
-            // 4つの壁を作成
             const wallPositions = [
-                { x: roomSize, y: wallHeight/2, z: 0, rotY: 0 },      // 右壁
-                { x: -roomSize, y: wallHeight/2, z: 0, rotY: 0 },     // 左壁
-                { x: 0, y: wallHeight/2, z: roomSize, rotY: Math.PI/2 },  // 奥壁
-                { x: 0, y: wallHeight/2, z: -roomSize, rotY: Math.PI/2 } // 手前壁
+                { x: roomSize, y: wallHeight/2, z: 0, rotY: 0 },
+                { x: -roomSize, y: wallHeight/2, z: 0, rotY: 0 },
+                { x: 0, y: wallHeight/2, z: roomSize, rotY: Math.PI/2 },
+                { x: 0, y: wallHeight/2, z: -roomSize, rotY: Math.PI/2 }
             ];
 
             wallPositions.forEach((pos, index) => {
-                // 物理エンジンの壁
                 const wallShape = new CANNON.Box(new CANNON.Vec3(0.5, wallHeight/2, roomSize));
                 const wallBody = new CANNON.Body({ mass: 0 });
                 wallBody.addShape(wallShape);
@@ -1088,20 +1139,19 @@
                 }
                 world.add(wallBody);
 
-                // 視覚的な壁（透明で見えない）
                 const wallGeometry = new THREE.BoxGeometry(1, wallHeight, roomSize * 2);
                 const wallMaterialThree = new THREE.MeshLambertMaterial({ 
                     color: 0xd4c4a8, 
                     transparent: true, 
-                    opacity: 0,  // 完全に透明
-                    visible: false  // レンダリングしない
+                    opacity: 0,
+                    visible: false
                 });
                 const wallMesh = new THREE.Mesh(wallGeometry, wallMaterialThree);
                 wallMesh.position.set(pos.x, pos.y, pos.z);
                 if (pos.rotY) {
                     wallMesh.rotation.y = pos.rotY;
                 }
-                wallMesh.castShadow = false;  // 壁は影を落とさない
+                wallMesh.castShadow = false;
                 wallMesh.receiveShadow = false;
                 scene.add(wallMesh);
             });
@@ -1124,53 +1174,10 @@
                 return;
             }
             
-            // ジオマンシーダイスを作成・振る
             createGeomancyDice();
         }
 
-        function createGeomancyDice() {
-            // 既存のダイスをクリア
-            clearDice();
-            
-            // 結果表示をリセット
-            resetDiceResults();
-            
-            // 4つのダイスを作成（火・風・水・地の順）
-            const elements = ['fire', 'air', 'water', 'earth'];
-            for (let i = 0; i < 4; i++) {
-                const dice = createSingleDice(i, elements[i]);
-                diceObjects.push(dice);
-            }
-            
-            // ダイスが完全に静止するまで待つ
-            checkDiceSettled();
-        }
-
-        function checkDiceSettled() {
-            const checkInterval = setInterval(() => {
-                let allSettled = true;
-                
-                diceObjects.forEach(dice => {
-                    const velocity = dice.body.velocity.length();
-                    const angularVelocity = dice.body.angularVelocity.length();
-                    
-                    // 速度がほぼゼロになったか確認（閾値を小さく）
-                    if (velocity > 0.01 || angularVelocity > 0.01) {
-                        allSettled = false;
-                    }
-                });
-                
-                if (allSettled) {
-                    clearInterval(checkInterval);
-                    setTimeout(() => {
-                        calculateDiceResults();
-                    }, 500);
-                }
-            }, 100);
-        }
-
         function createRoundedBoxGeometry(width, height, depth, radius, smoothness) {
-            // 角丸立方体ジオメトリを作成
             const shape = new THREE.Shape();
             const eps = 0.00001;
             const radius0 = radius - eps;
@@ -1194,29 +1201,39 @@
             return geometry;
         }
 
+        function createGeomancyDice() {
+            clearDice();
+            resetDiceResults();
+            
+            const elements = ['fire', 'air', 'water', 'earth'];
+            for (let i = 0; i < 4; i++) {
+                const dice = createSingleDice(i, elements[i]);
+                diceObjects.push(dice);
+            }
+            
+            checkDiceSettled();
+        }
+
         function createSingleDice(index, element) {
-            // 初期位置を離して配置（重ならないように、より高い位置から）
             const positions = [
-                [-3, 15, -3],  // 火
-                [3, 16, -3],   // 風
-                [-3, 17, 3],   // 水
-                [3, 18, 3]     // 地
+                [-3, 15, -3],
+                [3, 16, -3],
+                [-3, 17, 3],
+                [3, 18, 3]
             ];
             const pos = positions[index];
             
-            // 物理エンジンのダイス（3倍大きく）
             const diceShape = new CANNON.Box(new CANNON.Vec3(1.5, 1.5, 1.5));
             const diceMaterial = new CANNON.Material('dice');
             const diceBody = new CANNON.Body({ 
                 mass: 1,
                 material: diceMaterial,
-                linearDamping: 0.1,  // 空気抵抗を減らす（よりゆっくり減速）
-                angularDamping: 0.1  // 回転抵抗を減らす
+                linearDamping: 0.1,
+                angularDamping: 0.1
             });
             diceBody.addShape(diceShape);
             diceBody.position.set(pos[0], pos[1], pos[2]);
             
-            // ランダムな回転を追加
             diceBody.angularVelocity.set(
                 (Math.random() - 0.5) * 10,
                 (Math.random() - 0.5) * 10,
@@ -1225,15 +1242,13 @@
             
             world.add(diceBody);
 
-            // エレメントに応じた薄い色
             const colors = {
-                fire: 0xffcccc,    // 薄い赤
-                air: 0xffffcc,     // 薄い黄
-                water: 0xccddff,   // 薄い青
-                earth: 0xccffcc    // 薄い緑
+                fire: 0xffcccc,
+                air: 0xffffcc,
+                water: 0xccddff,
+                earth: 0xccffcc
             };
 
-            // 視覚的なダイス（3倍大きく、角を丸く）
             const diceGeometry = createRoundedBoxGeometry(3.0, 3.0, 3.0, 0.3, 8);
             const diceMaterialThree = new THREE.MeshLambertMaterial({ color: colors[element] });
             const diceMesh = new THREE.Mesh(diceGeometry, diceMaterialThree);
@@ -1241,10 +1256,8 @@
             diceMesh.receiveShadow = true;
             scene.add(diceMesh);
 
-            // ダイスの目を描画（1と2のみ）
             createDiceDots(diceMesh);
 
-            // アニメーション用の同期関数
             const diceObject = {
                 body: diceBody,
                 mesh: diceMesh,
@@ -1252,7 +1265,6 @@
                 element: element
             };
 
-            // 物理エンジンとビジュアルを同期
             function updateDice() {
                 if (diceBody && diceMesh) {
                     diceMesh.position.copy(diceBody.position);
@@ -1260,7 +1272,6 @@
                 }
             }
 
-            // アニメーションループに追加
             const originalAnimate = animate3D;
             animate3D = function() {
                 originalAnimate();
@@ -1271,59 +1282,45 @@
         }
 
         function createDiceDots(diceMesh) {
-            // ダイスの各面に1または2の目を描画（平面的な円形）
             const dotGeometry = new THREE.CircleGeometry(0.24, 16);
             const dotMaterial = new THREE.MeshBasicMaterial({ 
                 color: 0x333333,
                 side: THREE.DoubleSide
-            }); // 黒い目（平面）
+            });
 
-            // 各面の目の数を固定パターンで決定（対面が異なる値になるように）
             const faceValues = [
-                1, // 0: 右面 (+X)
-                2, // 1: 左面 (-X)
-                1, // 2: 上面 (+Y)
-                2, // 3: 下面 (-Y)
-                1, // 4: 前面 (+Z)
-                2  // 5: 後面 (-Z)
+                1, 2, 1, 2, 1, 2
             ];
             
-            // ダイスメッシュに面の値を保存
             diceMesh.userData.faceValues = faceValues;
 
-            // 各面の中心座標と向き（ローカル座標、3倍のサイズに合わせて）
             const faces = [
-                { normal: [1, 0, 0], center: [1.51, 0, 0], rotation: [0, Math.PI/2, 0], index: 0 },   // 右面 (+X)
-                { normal: [-1, 0, 0], center: [-1.51, 0, 0], rotation: [0, -Math.PI/2, 0], index: 1 }, // 左面 (-X)
-                { normal: [0, 1, 0], center: [0, 1.51, 0], rotation: [-Math.PI/2, 0, 0], index: 2 },   // 上面 (+Y)
-                { normal: [0, -1, 0], center: [0, -1.51, 0], rotation: [Math.PI/2, 0, 0], index: 3 }, // 下面 (-Y)
-                { normal: [0, 0, 1], center: [0, 0, 1.51], rotation: [0, 0, 0], index: 4 },   // 前面 (+Z)
-                { normal: [0, 0, -1], center: [0, 0, -1.51], rotation: [0, Math.PI, 0], index: 5 }  // 後面 (-Z)
+                { normal: [1, 0, 0], center: [1.51, 0, 0], rotation: [0, Math.PI/2, 0], index: 0 },
+                { normal: [-1, 0, 0], center: [-1.51, 0, 0], rotation: [0, -Math.PI/2, 0], index: 1 },
+                { normal: [0, 1, 0], center: [0, 1.51, 0], rotation: [-Math.PI/2, 0, 0], index: 2 },
+                { normal: [0, -1, 0], center: [0, -1.51, 0], rotation: [Math.PI/2, 0, 0], index: 3 },
+                { normal: [0, 0, 1], center: [0, 0, 1.51], rotation: [0, 0, 0], index: 4 },
+                { normal: [0, 0, -1], center: [0, 0, -1.51], rotation: [0, Math.PI, 0], index: 5 }
             ];
 
             faces.forEach((face) => {
-                // この面の目の数を取得
                 const dotCount = faceValues[face.index];
                 
                 if (dotCount === 1) {
-                    // 1つの目（中央）
                     const dot = new THREE.Mesh(dotGeometry, dotMaterial);
                     dot.position.set(face.center[0], face.center[1], face.center[2]);
                     dot.rotation.set(face.rotation[0], face.rotation[1], face.rotation[2]);
                     diceMesh.add(dot);
                 } else {
-                    // 2つの目（対角線上、3倍のサイズに合わせて）
                     const positions = [
                         [face.center[0] - 0.6, face.center[1] - 0.6, face.center[2]],
                         [face.center[0] + 0.6, face.center[1] + 0.6, face.center[2]]
                     ];
                     
                     if (face.normal[0] !== 0) {
-                        // X軸面の場合、Y-Z平面上に配置
                         positions[0] = [face.center[0], face.center[1] - 0.6, face.center[2] - 0.6];
                         positions[1] = [face.center[0], face.center[1] + 0.6, face.center[2] + 0.6];
                     } else if (face.normal[1] !== 0) {
-                        // Y軸面の場合、X-Z平面上に配置
                         positions[0] = [face.center[0] - 0.6, face.center[1], face.center[2] - 0.6];
                         positions[1] = [face.center[0] + 0.6, face.center[1], face.center[2] + 0.6];
                     }
@@ -1336,6 +1333,19 @@
                     });
                 }
             });
+        }
+
+        function clearDice() {
+            diceObjects.forEach(dice => {
+                if (dice.body) {
+                    world.remove(dice.body);
+                }
+                if (dice.mesh) {
+                    scene.remove(dice.mesh);
+                }
+            });
+            diceObjects = [];
+            diceResults = [];
         }
 
         function resetDiceResults() {
@@ -1352,46 +1362,50 @@
             resultElement.classList.remove('empty');
         }
 
-        function clearDice() {
-            diceObjects.forEach(dice => {
-                if (dice.body) {
-                    world.remove(dice.body);
+        function checkDiceSettled() {
+            const checkInterval = setInterval(() => {
+                let allSettled = true;
+                
+                diceObjects.forEach(dice => {
+                    const velocity = dice.body.velocity.length();
+                    const angularVelocity = dice.body.angularVelocity.length();
+                    
+                    if (velocity > 0.01 || angularVelocity > 0.01) {
+                        allSettled = false;
+                    }
+                });
+                
+                if (allSettled) {
+                    clearInterval(checkInterval);
+                    setTimeout(() => {
+                        calculateDiceResults();
+                    }, 500);
                 }
-                if (dice.mesh) {
-                    scene.remove(dice.mesh);
-                }
-            });
-            diceObjects = [];
-            diceResults = [];
+            }, 100);
         }
 
         function calculateDiceResults() {
             diceResults = [];
             
             diceObjects.forEach((dice, index) => {
-                // ダイスの上面を判定（Y軸の正の方向 = 上）
                 const upVector = new THREE.Vector3(0, 1, 0);
                 
-                // 各面の法線ベクトル（ローカル座標）
                 const faceNormals = [
-                    new THREE.Vector3(1, 0, 0),   // 0: 右面 (+X)
-                    new THREE.Vector3(-1, 0, 0),  // 1: 左面 (-X)
-                    new THREE.Vector3(0, 1, 0),   // 2: 上面 (+Y)
-                    new THREE.Vector3(0, -1, 0),  // 3: 下面 (-Y)
-                    new THREE.Vector3(0, 0, 1),   // 4: 前面 (+Z)
-                    new THREE.Vector3(0, 0, -1)   // 5: 後面 (-Z)
+                    new THREE.Vector3(1, 0, 0),
+                    new THREE.Vector3(-1, 0, 0),
+                    new THREE.Vector3(0, 1, 0),
+                    new THREE.Vector3(0, -1, 0),
+                    new THREE.Vector3(0, 0, 1),
+                    new THREE.Vector3(0, 0, -1)
                 ];
                 
                 let maxDot = -1;
                 let topFaceIndex = 0;
                 
-                // 各面の法線をダイスの回転に合わせて変換し、上向きベクトルとの内積を計算
                 faceNormals.forEach((faceNormal, faceIndex) => {
-                    // 面の法線をダイスの回転で変換
                     const rotatedNormal = faceNormal.clone();
                     rotatedNormal.applyQuaternion(dice.mesh.quaternion);
                     
-                    // 上向きベクトルとの内積（大きいほど上を向いている）
                     const dot = upVector.dot(rotatedNormal);
                     
                     if (dot > maxDot) {
@@ -1400,15 +1414,12 @@
                     }
                 });
                 
-                // 上を向いている面の値を取得
                 const result = dice.mesh.userData.faceValues[topFaceIndex];
                 diceResults.push(result);
                 
-                // 結果表示を更新
                 updateDiceResult(index, result);
             });
             
-            // 結果からジオマンシーシンボルを生成
             setTimeout(() => {
                 generateSymbolFromDice();
             }, 1500);
@@ -1421,19 +1432,18 @@
             
             const pattern = diceResults.join('');
             
-            // ドット画面と同じシンボル表示ロジック
             let symbol = geomancySymbols[pattern];
             if (!symbol) {
                 const keys = Object.keys(geomancySymbols);
                 symbol = geomancySymbols[keys[0]];
             }
             
-            // ダイアログの内容を更新
-            document.getElementById('symbol-image').innerHTML = symbol.symbol.replace(/\n/g, '<br>');
+            document.getElementById('symbol-image').src = `${pattern}.png`;
             document.getElementById('symbol-name').textContent = symbol.name;
+            document.getElementById('symbol-yesno').textContent = `Yes/No: ${symbol.yesno}`;
+            document.getElementById('symbol-fortune').textContent = `吉凶: ${symbol.fortune}`;
             document.getElementById('symbol-meaning').textContent = symbol.meaning;
             
-            // ダイアログを表示
             document.getElementById('symbolDialog').classList.add('show');
         }
 
@@ -1441,16 +1451,13 @@
             alert('Geomancy Diary アプリの詳細ページへ移動します\n（実装予定）');
         }
 
-        // 初期化時に追加するイベントリスナー
         document.addEventListener('DOMContentLoaded', function() {
-            // ダイアログのクリック外で閉じる
             document.getElementById('symbolDialog').addEventListener('click', (e) => {
                 if (e.target.id === 'symbolDialog') {
                     closeSymbolDialog();
                 }
             });
 
-            // ESCキーでダイアログを閉じる
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     if (document.getElementById('symbolDialog').classList.contains('show')) {
@@ -1460,7 +1467,6 @@
             });
         });
 
-        // タッチ操作の改善
         document.addEventListener('touchstart', function() {}, {passive: true});
     </script>
 </body>
