@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ジオマンシー ワンオラクル</title>
+    <title>ジオマンシー・ワンオラクル</title>
     <meta name="description" content="シンプルなジオマンシー占いアプリ - ワンオラクルでメッセージを受け取ろう">
     <meta name="theme-color" content="#2c3e50">
     
@@ -122,6 +122,20 @@
             color: rgba(93,78,55,0.8);
             line-height: 1.6;
             margin-bottom: 16px;
+        }
+
+        .info-link {
+            display: inline-block;
+            color: #8b7355;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .info-link:hover {
+            color: #5d4e37;
+            text-decoration: underline;
         }
 
         .app-links-container {
@@ -474,6 +488,14 @@
             max-width: 400px;
             position: relative;
             padding: 24px;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .symbol-dialog.show .symbol-content {
+            opacity: 1;
+            transform: scale(1);
         }
 
         .symbol-header {
@@ -577,7 +599,7 @@
     <div class="container">
         <div id="home-screen" class="screen active">
             <div class="header">
-                <h1 class="title">ジオマンシー ワンオラクル</h1>
+                <h1 class="title">ジオマンシー・オンライン</h1>
             </div>
 
             <div class="info-section">
@@ -585,6 +607,9 @@
                 <p class="info-text">
                     古代から伝わる土占い。16のシンボルを使って、今のあなたに必要なメッセージを受け取ることができます。ワンオラクルは最もシンプルな占い方で、一つのシンボルからインスピレーションを得ます。
                 </p>
+                <a href="https://ja.wikipedia.org/wiki/%E3%82%B8%E3%82%AA%E3%83%9E%E3%83%B3%E3%82%B7%E3%83%BC" class="info-link" target="_blank" rel="noopener noreferrer">
+                    さらに詳しく →
+                </a>
             </div>
 
             <div class="oracle-buttons">
@@ -601,6 +626,10 @@
                 <h3 class="info-title">Geomancy Diary アプリ</h3>
                 <p class="info-text">
                     より本格的なジオマンシー占いを楽しみたい方は、スマートフォンアプリ「Geomancy Diary」をご利用ください。
+                </p>
+                <p class="info-text">
+                    <strong>iPhone/iPadアプリ：</strong>ジオマンシー占いの第一人者・高橋桐矢さまによるシンボルごとの詳細なメッセージ、NORI STAR CREAMさまの心あたたまるカラーテーマを搭載。日記アプリと統合され、日々の占いを記録として残せます。<br>
+                    <strong>Androidアプリ：</strong>ワンオラクルに加え、シールドチャート、シンプル・トリプシティ、パスワークなど多彩な占い方法に対応。本格的なジオマンシー占いを手軽に楽しめます。
                 </p>
                 <div class="app-links-container">
                     <a href="https://apps.apple.com/jp/app/geomancy-diary/id6670341755" class="app-link" target="_blank" rel="noopener noreferrer">
@@ -1027,7 +1056,6 @@
 
         function initDicePhysics() {
             if (!world || !scene) return;
-            document.getElementById('symbol-image').src = '';
             clearDice();
             createGeomancyDice();
         }
