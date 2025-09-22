@@ -1,8 +1,9 @@
-const CACHE_NAME = 'geomancy-v4';
+const CACHE_NAME = 'geomancy-v5';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
+  './blank.png',
   // シンボル画像
   './1111.png',
   './1112.png',
@@ -35,6 +36,7 @@ self.addEventListener('install', (event) => {
           './',
           './index.html',
           './manifest.json',
+          './blank.png',
           './1111.png',
           './1112.png',
           './1121.png',
