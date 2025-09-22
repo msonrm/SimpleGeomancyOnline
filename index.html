@@ -599,7 +599,7 @@
     <div class="container">
         <div id="home-screen" class="screen active">
             <div class="header">
-                <h1 class="title">ジオマンシー・オンライン</h1>
+                <h1 class="title">ジオマンシー ワンオラクル</h1>
             </div>
 
             <div class="info-section">
@@ -798,16 +798,12 @@
         function showDotOracle() {
             hideAllScreens();
             document.getElementById('dot-oracle-screen').classList.add('active');
-            // 画像をblank.pngに設定
-            document.getElementById('symbol-image').src = 'blank.png';
             resetDotOracle();
         }
 
         function showDiceOracle() {
             hideAllScreens();
             document.getElementById('dice-oracle-screen').classList.add('active');
-            // 画像をblank.pngに設定
-            document.getElementById('symbol-image').src = 'blank.png';
             setTimeout(() => { 
                 init3DScene();
                 createIdleDice();
@@ -909,17 +905,21 @@
                 const keys = Object.keys(geomancySymbols);
                 symbol = geomancySymbols[keys[0]];
             }
-            document.getElementById('symbol-image').src = `${pattern}.png`;
-            document.getElementById('symbol-name').textContent = symbol.name;
-            document.getElementById('symbol-yesno').textContent = `Yes/No: ${symbol.yesno}`;
-            document.getElementById('symbol-fortune').textContent = `吉凶: ${symbol.fortune}`;
-            document.getElementById('symbol-meaning').textContent = symbol.meaning;
-            document.getElementById('symbolDialog').classList.add('show');
+            
+            // 画像をプリロードしてから表示
+            const img = new Image();
+            img.onload = () => {
+                document.getElementById('symbol-image').src = `${pattern}.png`;
+                document.getElementById('symbol-name').textContent = symbol.name;
+                document.getElementById('symbol-yesno').textContent = `Yes/No: ${symbol.yesno}`;
+                document.getElementById('symbol-fortune').textContent = `吉凶: ${symbol.fortune}`;
+                document.getElementById('symbol-meaning').textContent = symbol.meaning;
+                document.getElementById('symbolDialog').classList.add('show');
+            };
+            img.src = `${pattern}.png`;
         }
 
         function closeSymbolDialog() {
-            // ダイアログを閉じた直後にblank.pngに戻す
-            document.getElementById('symbol-image').src = 'blank.png';
             document.getElementById('symbolDialog').classList.remove('show');
             setTimeout(() => {
                 const currentScreen = document.querySelector('.screen.active');
@@ -1057,6 +1057,13 @@
         function animate3D() {
             animationId = requestAnimationFrame(animate3D);
             if (world) world.step(1/60);
+            animateIdleDice();
+            diceObjects.forEach((dice) => {
+                if (dice.body && dice.mesh && !dice.idleRotation) {
+                    dice.mesh.position.copy(dice.body.position);
+                    dice.mesh.quaternion.copy(dice.body.quaternion);
+                }
+            });
             if (renderer && scene && camera) renderer.render(scene, camera);
         }
 
@@ -1088,8 +1095,6 @@
                 const diceObject = { mesh: diceMesh, id: i, element: elements[i], idleRotation: true };
                 diceObjects.push(diceObject);
             }
-            
-            animateIdleDice();
         }
 
         function animateIdleDice() {
@@ -1100,19 +1105,6 @@
                     dice.mesh.rotation.z += 0.008;
                 }
             });
-        }
-
-        function animate3D() {
-            animationId = requestAnimationFrame(animate3D);
-            if (world) world.step(1/60);
-            animateIdleDice();
-            diceObjects.forEach((dice) => {
-                if (dice.body && dice.mesh && !dice.idleRotation) {
-                    dice.mesh.position.copy(dice.body.position);
-                    dice.mesh.quaternion.copy(dice.body.quaternion);
-                }
-            });
-            if (renderer && scene && camera) renderer.render(scene, camera);
         }
 
         function createRoundedBoxGeometry(width, height, depth, radius, smoothness) {
@@ -1284,12 +1276,18 @@
                 const keys = Object.keys(geomancySymbols);
                 symbol = geomancySymbols[keys[0]];
             }
-            document.getElementById('symbol-image').src = `${pattern}.png`;
-            document.getElementById('symbol-name').textContent = symbol.name;
-            document.getElementById('symbol-yesno').textContent = `Yes/No: ${symbol.yesno}`;
-            document.getElementById('symbol-fortune').textContent = `吉凶: ${symbol.fortune}`;
-            document.getElementById('symbol-meaning').textContent = symbol.meaning;
-            document.getElementById('symbolDialog').classList.add('show');
+            
+            // 画像をプリロードしてから表示
+            const img = new Image();
+            img.onload = () => {
+                document.getElementById('symbol-image').src = `${pattern}.png`;
+                document.getElementById('symbol-name').textContent = symbol.name;
+                document.getElementById('symbol-yesno').textContent = `Yes/No: ${symbol.yesno}`;
+                document.getElementById('symbol-fortune').textContent = `吉凶: ${symbol.fortune}`;
+                document.getElementById('symbol-meaning').textContent = symbol.meaning;
+                document.getElementById('symbolDialog').classList.add('show');
+            };
+            img.src = `${pattern}.png`;
         }
 
         document.addEventListener('DOMContentLoaded', function() {
