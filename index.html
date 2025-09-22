@@ -798,12 +798,16 @@
         function showDotOracle() {
             hideAllScreens();
             document.getElementById('dot-oracle-screen').classList.add('active');
+            // 画像をblank.pngに設定
+            document.getElementById('symbol-image').src = 'blank.png';
             resetDotOracle();
         }
 
         function showDiceOracle() {
             hideAllScreens();
             document.getElementById('dice-oracle-screen').classList.add('active');
+            // 画像をblank.pngに設定
+            document.getElementById('symbol-image').src = 'blank.png';
             setTimeout(() => { 
                 init3DScene();
                 createIdleDice();
@@ -914,11 +918,10 @@
         }
 
         function closeSymbolDialog() {
+            // ダイアログを閉じた直後にblank.pngに戻す
+            document.getElementById('symbol-image').src = 'blank.png';
             document.getElementById('symbolDialog').classList.remove('show');
             setTimeout(() => {
-                // 画像をクリア
-                document.getElementById('symbol-image').src = 'blank.png';
-                
                 const currentScreen = document.querySelector('.screen.active');
                 if (currentScreen && currentScreen.id === 'dot-oracle-screen') {
                     resetDotOracle();
