@@ -136,6 +136,13 @@
             opacity: 0.85;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .shield-chart-preview:hover {
+            opacity: 1;
+            transform: scale(1.05);
         }
 
         @media (max-width: 480px) {
@@ -649,7 +656,7 @@
                     → さらに詳しく：高橋桐矢「キリヤ・レポート」
                 </a>
                 <p class="info-text" style="margin-top: 16px;">
-                    <img src="ShieldChart.png" alt="シールドチャート例" class="shield-chart-preview">
+                    <img src="ShieldChart.png" alt="シールドチャート例" class="shield-chart-preview" onclick="showShieldChartInfo()">
                     <strong>このウェブアプリはお試し版です。</strong>より本格的なジオマンシー占いを楽しみたい方は、下記のスマートフォンアプリ「Geomancy Diary」をぜひご利用ください。アプリ版ではワンオラクルのほかに、ジオマンシー占いの奥義といわれる<strong>シールドチャート</strong>を生成できます。
                 </p>
             </div>
@@ -807,6 +814,25 @@
             
             <div class="symbol-meaning" id="symbol-meaning">
                 小さく一時的な幸運、ささやかな幸せ。周りからの援助。
+            </div>
+        </div>
+    </div>
+
+    <div class="symbol-dialog" id="shieldChartDialog">
+        <div class="symbol-content">
+            <div class="symbol-header">
+                <h3>シールドチャートとは</h3>
+                <button class="close-button" onclick="closeShieldChartDialog()">×</button>
+            </div>
+            
+            <div class="symbol-image-area">
+                <img class="symbol-image" src="ShieldChart.png" alt="シールドチャート">
+            </div>
+            
+            <div class="symbol-meaning">
+                シールドチャートは、ジオマンシー占いの奥義といわれる本格的な占い方法です。<br><br>
+                最初に4つのシンボル（4人の母）を生成し、それらをもとに全部で15のシンボルを導き出します。ワンオラクルよりもずっと詳しい状況分析や、複雑な質問への回答が可能になります。<br><br>
+                シンボルの配置が盾（シールド）の形に見立てられることから、「シールドチャート」と呼ばれています。
             </div>
         </div>
     </div>
@@ -979,6 +1005,14 @@
                     resetDiceResults();
                 }
             }, 300);
+        }
+
+        function showShieldChartInfo() {
+            document.getElementById('shieldChartDialog').classList.add('show');
+        }
+
+        function closeShieldChartDialog() {
+            document.getElementById('shieldChartDialog').classList.remove('show');
         }
 
         function animatePairing(zoneIndex) {
