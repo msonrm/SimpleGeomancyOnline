@@ -129,6 +129,16 @@
             color: #5d4e37;
         }
 
+        .info-text .shield-chart-link {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: underline;
+        }
+
+        .info-text .shield-chart-link:hover {
+            color: #8b7355;
+        }
+
         .shield-chart-preview {
             float: right;
             width: 120px;
@@ -657,17 +667,20 @@
                 </a>
                 <p class="info-text" style="margin-top: 16px;">
                     <img src="ShieldChart.png" alt="シールドチャート例" class="shield-chart-preview" onclick="showShieldChartInfo()">
-                    <strong>このウェブアプリはお試し版です。</strong>より本格的なジオマンシー占いを楽しみたい方は、下記のスマートフォンアプリ「Geomancy Diary」をぜひご利用ください。アプリ版ではワンオラクルのほかに、ジオマンシー占いの奥義といわれる<strong>シールドチャート</strong>を生成できます。
+                    <strong>このウェブアプリはお試し版です。</strong>より本格的なジオマンシー占いを楽しみたい方は、下記のスマートフォンアプリ「Geomancy Diary」をぜひご利用ください。アプリ版ではワンオラクルのほかに、ジオマンシー占いの奥義といわれる<strong class="shield-chart-link" onclick="showShieldChartInfo()">シールドチャート</strong>を生成できます。
                 </p>
             </div>
 
             <div class="oracle-buttons">
+                <p class="info-text" style="text-align: center; margin-bottom: 10px; color: rgba(93,78,55,0.9);">
+                    占い方を選んでください
+                </p>
                 <button class="oracle-button" onclick="showDotOracle()">
-                    ワンオラクル（ドット）
+                    ワンオラクル（ドット）で占う
                 </button>
                 
                 <button class="oracle-button" onclick="showDiceOracle()">
-                    ワンオラクル（ダイス）
+                    ワンオラクル（ダイス）で占う
                 </button>
             </div>
 
@@ -677,7 +690,9 @@
                     より本格的なジオマンシー占いを楽しみたい方は、スマートフォンアプリ「Geomancy Diary」をご利用ください。
                 </p>
                 <p class="info-text">
-                    <strong>iPhone/iPadアプリ：</strong>児童書作家兼占い師でありジオマンシー占いの第一人者・<a href="https://lit.link/kiriya" target="_blank" rel="noopener noreferrer">高橋桐矢</a>さまによるシンボルごとの詳細なメッセージ、占い師・イラストレーターの<a href="https://noristarcream.wixsite.com/noristarcream" target="_blank" rel="noopener noreferrer">NORI STAR CREAM</a>さまの心温まるカラーテーマを搭載。ドット・ダイスそれぞれでワンオラクルとシールドチャート占いに対応し、実際のカード等で占った結果の記録も可能。日記アプリと統合され、日々の占いを記録として残せます。<br>
+                    <strong>iPhone/iPadアプリ：</strong>児童書作家兼占い師でありジオマンシー占いの第一人者・<a href="https://lit.link/kiriya" target="_blank" rel="noopener noreferrer">高橋桐矢</a>さまによるシンボルごとの詳細なメッセージ、占い師・イラストレーターの<a href="https://noristarcream.wixsite.com/noristarcream" target="_blank" rel="noopener noreferrer">NORI STAR CREAM</a>さまの心温まるカラーテーマを搭載。ドット・ダイスそれぞれでワンオラクルとシールドチャートに対応し、実際のカード等で占った結果の記録も可能。日記アプリと統合され、日々の占いを記録として残せます。
+                </p>
+                <p class="info-text">
                     <strong>Androidアプリ：</strong>ワンオラクルに加え、シールドチャート、シンプル・トリプシティ、パスワークなど多彩な占い方法に対応。本格的なジオマンシー占いを手軽に楽しめます。
                 </p>
                 <div class="app-links-container">
