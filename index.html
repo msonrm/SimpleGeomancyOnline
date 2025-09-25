@@ -901,7 +901,7 @@
                 </div>
                 <div class="symbol-expand-content" id="symbol-expand-content">
                     <div class="symbol-expand-text">
-                        シンボルには上記のほか、サインや天体、属性などの対応があります。詳しくは書籍や<a href="#" onclick="closeSymbolDialog(); showHome(); scrollToAppSection();">スマートフォンアプリ「Geomancy Diary」</a>をご利用ください。
+                        シンボルには上記のほか、サインや天体、エレメントなどの対応があります。詳しくは書籍や<a href="#" onclick="closeSymbolDialog(); showHome(); scrollToAppSection();">スマートフォンアプリ「Geomancy Diary」</a>をご利用ください。
                     </div>
                 </div>
             </div>
@@ -1076,6 +1076,10 @@
                 document.getElementById('symbol-yesno').textContent = `Yes/No: ${symbol.yesno}`;
                 document.getElementById('symbol-fortune').textContent = `吉凶: ${symbol.fortune}`;
                 document.getElementById('symbol-meaning').textContent = symbol.meaning;
+                
+                // 展開セクションを初期化（必ず閉じた状態にする）
+                resetSymbolExpandSection();
+                
                 document.getElementById('symbolDialog').classList.add('show');
             };
             img.src = `${pattern}.png`;
@@ -1132,6 +1136,16 @@
                     appSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             }, 400);
+        }
+
+        function resetSymbolExpandSection() {
+            const content = document.getElementById('symbol-expand-content');
+            const arrow = document.getElementById('expand-arrow');
+            const text = document.getElementById('expand-text');
+            
+            content.classList.remove('open');
+            arrow.classList.remove('rotated');
+            text.textContent = 'より詳しく';
         }
 
         function animatePairing(zoneIndex) {
@@ -1513,6 +1527,10 @@
                 document.getElementById('symbol-yesno').textContent = `Yes/No: ${symbol.yesno}`;
                 document.getElementById('symbol-fortune').textContent = `吉凶: ${symbol.fortune}`;
                 document.getElementById('symbol-meaning').textContent = symbol.meaning;
+                
+                // 展開セクションを初期化（必ず閉じた状態にする）
+                resetSymbolExpandSection();
+                
                 document.getElementById('symbolDialog').classList.add('show');
             };
             img.src = `${pattern}.png`;
