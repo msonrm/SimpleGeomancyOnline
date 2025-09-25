@@ -3,8 +3,8 @@
   "short_name": "ジオマンシー",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#2c3e50",
-  "theme_color": "#2c3e50",
+  "background_color": "#323232",
+  "theme_color": "#e8dcc6",
   "description": "シンプルなジオマンシー占いアプリ - ワンオラクルでメッセージを受け取ろう",
   "icons": [
     {
