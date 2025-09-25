@@ -40,6 +40,8 @@
 
         .oracle-screen .container {
             padding: 20px;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .header {
@@ -288,6 +290,9 @@
 
         .oracle-screen {
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
 
         .oracle-title {
@@ -634,6 +639,64 @@
             text-align: left;
         }
 
+        .symbol-expand-section {
+            margin-top: 20px;
+            border-top: 1px solid rgba(139,115,85,0.2);
+            padding-top: 16px;
+        }
+
+        .symbol-expand-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px 0;
+            color: #8b7355;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .symbol-expand-toggle:hover {
+            color: #5d4e37;
+        }
+
+        .symbol-expand-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .symbol-expand-content.open {
+            max-height: 200px;
+        }
+
+        .symbol-expand-text {
+            padding-top: 12px;
+            font-size: 13px;
+            color: rgba(93,78,55,0.8);
+            line-height: 1.5;
+        }
+
+        .symbol-expand-text a {
+            color: #8b7355;
+            text-decoration: underline;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .symbol-expand-text a:hover {
+            color: #5d4e37;
+        }
+
+        #expand-arrow {
+            transition: transform 0.3s ease;
+        }
+
+        #expand-arrow.rotated {
+            transform: rotate(180deg);
+        }
+
         @media (max-width: 480px) {
             .container {
                 padding: 16px;
@@ -830,6 +893,18 @@
             <div class="symbol-meaning" id="symbol-meaning">
                 小さく一時的な幸運、ささやかな幸せ。周りからの援助。
             </div>
+            
+            <div class="symbol-expand-section">
+                <div class="symbol-expand-toggle" onclick="toggleSymbolDetails()">
+                    <span id="expand-text">より詳しく</span>
+                    <span id="expand-arrow">▼</span>
+                </div>
+                <div class="symbol-expand-content" id="symbol-expand-content">
+                    <div class="symbol-expand-text">
+                        シンボルには上記のほか、サインや天体、属性などの対応があります。詳しくは書籍や<a href="#" onclick="closeSymbolDialog(); showHome(); scrollToAppSection();">スマートフォンアプリ「Geomancy Diary」</a>をご利用ください。
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1018,6 +1093,10 @@
                     clearDice();
                     createIdleDice();
                     resetDiceResults();
+                    // ダイスボタンを元に戻す
+                    const diceRollBtn = document.getElementById('dice-roll-btn');
+                    diceRollBtn.textContent = 'ダイスを振る';
+                    diceRollBtn.disabled = false;
                 }
             }, 300);
         }
@@ -1028,6 +1107,31 @@
 
         function closeShieldChartDialog() {
             document.getElementById('shieldChartDialog').classList.remove('show');
+        }
+
+        function toggleSymbolDetails() {
+            const content = document.getElementById('symbol-expand-content');
+            const arrow = document.getElementById('expand-arrow');
+            const text = document.getElementById('expand-text');
+            
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                arrow.classList.remove('rotated');
+                text.textContent = 'より詳しく';
+            } else {
+                content.classList.add('open');
+                arrow.classList.add('rotated');
+                text.textContent = '閉じる';
+            }
+        }
+
+        function scrollToAppSection() {
+            setTimeout(() => {
+                const appSection = document.querySelector('.app-promo-section');
+                if (appSection) {
+                    appSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 400);
         }
 
         function animatePairing(zoneIndex) {
@@ -1164,8 +1268,32 @@
 
         function initDicePhysics() {
             if (!world || !scene) return;
-            clearDice();
-            createGeomancyDice();
+            
+            // 既にダイスが存在する場合は回転力のみ追加
+            if (diceObjects.length > 0 && diceObjects.some(dice => dice.body)) {
+                diceObjects.forEach(dice => {
+                    if (dice.body && !dice.idleRotation) {
+                        // 現在の位置を保持したまま新しい回転力を追加（強めに設定）
+                        dice.body.angularVelocity.set(
+                            (Math.random() - 0.5) * 25,
+                            (Math.random() - 0.5) * 25,
+                            (Math.random() - 0.5) * 25
+                        );
+                        // もう少し強く上に持ち上げる
+                        dice.body.velocity.set(
+                            (Math.random() - 0.5) * 3,
+                            4,
+                            (Math.random() - 0.5) * 3
+                        );
+                    }
+                });
+                resetDiceResults();
+                checkDiceSettled();
+            } else {
+                // 初回の場合は新しくダイスを作成
+                clearDice();
+                createGeomancyDice();
+            }
         }
 
         function createIdleDice() {
@@ -1335,6 +1463,11 @@
 
         function calculateDiceResults() {
             diceResults = [];
+            // ボタンを「生成中...」に変更して無効化
+            const diceRollBtn = document.getElementById('dice-roll-btn');
+            diceRollBtn.textContent = '生成中...';
+            diceRollBtn.disabled = true;
+            
             diceObjects.forEach((dice, index) => {
                 const upVector = new THREE.Vector3(0, 1, 0);
                 const faceNormals = [
