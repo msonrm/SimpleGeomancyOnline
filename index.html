@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ジオマンシー ワンオラクル</title>
     <meta name="description" content="シンプルなジオマンシー占いアプリ - ワンオラクルでメッセージを受け取ろう">
-    <meta name="theme-color" content="#2c3e50">
+    <meta name="theme-color" content="#e8dcc6">
     
     <!-- PWA manifest -->
     <link rel="manifest" href="manifest.json">
@@ -817,7 +817,7 @@
             
             <div style="padding: 16px 20px 20px 20px; text-align: center;">
                 <p style="color: rgba(93,78,55,0.7); font-size: 14px; margin-bottom: 16px; line-height: 1.4;">
-                    各領域を右から左に向かって、思いのままに自由な個数でドットを打ってください。4つの領域すべてにドットが配置されたら「シンボルを生成」ボタンを押してください。ドットの偶数・奇数の組み合わせからジオマンシーのシンボルが決まります。
+                    どんなことを占いたいのかを強く心に思いながら、各領域を右から左に向かって、思いのままに自由な個数でドットを打ってください。4つの領域すべてにドットが配置されたら「シンボルを生成」ボタンを押してください。ドットの偶数・奇数の組み合わせからジオマンシーのシンボルが決まります。
                 </p>
                 <button class="generate-button" id="generate-btn" onclick="generateSymbol()">
                     シンボルを生成
@@ -834,7 +834,7 @@
                 
                 <div style="padding: 16px 20px 20px 20px; text-align: center;">
                     <p style="color: rgba(93,78,55,0.7); font-size: 14px; margin-bottom: 16px; line-height: 1.4;">
-                        4つのエレメント（火・風・水・地）を表すダイス（1と2の目のみ）を振って、シンボルを生成します。
+                        どんなことを占いたいのかを強く心に思いながら、あなたのタイミングで「ダイスを振る」ボタンを押してください。4つのエレメント（火・風・水・地）を象徴する4つのダイスが振られ、出た目に応じてジオマンシーのシンボルが決まります。
                     </p>
                     
                     <div class="dice-results">
@@ -901,7 +901,7 @@
                 </div>
                 <div class="symbol-expand-content" id="symbol-expand-content">
                     <div class="symbol-expand-text">
-                        シンボルには上記のほか、サインや天体、エレメントなどの対応があります。詳しくは書籍や<a href="#" onclick="closeSymbolDialog(); showHome(); scrollToAppSection();">スマートフォンアプリ「Geomancy Diary」</a>をご利用ください。
+                        このシンボルには、天体やサイン（十二宮）など、さらに詳しい対応関係があります。より豊富なメッセージと解釈をお求めの方は、<a href="#" onclick="closeSymbolDialog(); showHome(); scrollToAppSection();">スマートフォンアプリ「Geomancy Diary」</a>をお試しください。
                     </div>
                 </div>
             </div>
@@ -960,12 +960,24 @@
         function showDotOracle() {
             hideAllScreens();
             document.getElementById('dot-oracle-screen').classList.add('active');
+            // スクロール位置を最上部に
+            window.scrollTo(0, 0);
+            // ボタンを初期状態に戻す
+            const generateBtn = document.getElementById('generate-btn');
+            generateBtn.textContent = 'シンボルを生成';
+            isGenerating = false;
             resetDotOracle();
         }
 
         function showDiceOracle() {
             hideAllScreens();
             document.getElementById('dice-oracle-screen').classList.add('active');
+            // スクロール位置を最上部に
+            window.scrollTo(0, 0);
+            // ボタンを初期状態に戻す
+            const diceRollBtn = document.getElementById('dice-roll-btn');
+            diceRollBtn.textContent = 'ダイスを振る';
+            diceRollBtn.disabled = false;
             setTimeout(() => { 
                 init3DScene();
                 createIdleDice();
@@ -975,6 +987,8 @@
         function showHome() {
             hideAllScreens();
             document.getElementById('home-screen').classList.add('active');
+            // スクロール位置を最上部に
+            window.scrollTo(0, 0);
         }
 
         function hideAllScreens() {
@@ -1537,7 +1551,12 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Escキーでの閉じる機能も削除
+            // スクロール復元を無効化してスクロール位置を制御
+            if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'manual';
+            }
+            // 初期表示時も最上部に
+            window.scrollTo(0, 0);
         });
 
         document.addEventListener('touchstart', function() {}, {passive: true});
