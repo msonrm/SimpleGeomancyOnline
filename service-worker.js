@@ -3,7 +3,7 @@ const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
-  './blank.png',
+  './ShieldChart.png',
   // シンボル画像
   './1111.png',
   './1112.png',
@@ -36,7 +36,7 @@ self.addEventListener('install', (event) => {
           './',
           './index.html',
           './manifest.json',
-          './blank.png',
+          './ShieldChart.png',
           './1111.png',
           './1112.png',
           './1121.png',
