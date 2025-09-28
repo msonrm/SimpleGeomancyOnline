@@ -230,11 +230,6 @@
             box-shadow: 0 6px 20px rgba(139,115,85,0.4);
         }
 
-        .install-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(93,78,55,0.4);
-        }
-
         .update-banner {
             position: fixed;
             bottom: 20px;
@@ -249,10 +244,25 @@
             z-index: 1001;
             text-align: center;
             max-width: 90%;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
         .update-banner.show {
             display: block;
+            opacity: 1;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
         }
 
         .update-button {
@@ -269,6 +279,7 @@
 
         .update-button:hover {
             transform: scale(1.05);
+            background: #f5f0e8;
         }
 
         .screen {
@@ -363,15 +374,6 @@
             z-index: 1;
         }
 
-        .zone-label {
-            position: absolute;
-            top: 8px;
-            left: 12px;
-            font-size: 12px;
-            color: rgba(93,78,55,0.6);
-            display: none;
-        }
-
         .generate-button {
             background: rgba(93,78,55,0.3);
             border: none;
@@ -396,45 +398,6 @@
         .generate-button.active:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 15px rgba(139,115,85,0.3);
-        }
-
-        .dice-container {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 30px 0;
-            flex-wrap: wrap;
-        }
-
-        .dice {
-            width: 60px;
-            height: 60px;
-            background: white;
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: #2c3e50;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .dice:hover {
-            transform: scale(1.1);
-        }
-
-        .dice.rolling {
-            animation: roll 1s infinite;
-        }
-
-        @keyframes roll {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(90deg); }
-            50% { transform: rotate(180deg); }
-            75% { transform: rotate(270deg); }
         }
 
         .roll-button {
@@ -652,22 +615,28 @@
             margin-top: 20px;
             border-top: 1px solid rgba(139,115,85,0.2);
             padding-top: 16px;
+            text-align: right;
         }
 
         .symbol-expand-toggle {
-            display: flex;
+            display: inline-flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            padding: 8px 0;
-            color: #8b7355;
-            font-size: 14px;
-            font-weight: 500;
+            padding: 6px 12px;
+            color: rgba(139,115,85,0.8);
+            font-size: 13px;
+            font-weight: 400;
             transition: all 0.2s ease;
+            border-radius: 6px;
+            background: rgba(139,115,85,0.05);
+            gap: 8px;
+            min-width: 100px;
         }
 
         .symbol-expand-toggle:hover {
-            color: #5d4e37;
+            color: #8b7355;
+            background: rgba(139,115,85,0.1);
         }
 
         .symbol-expand-content {
@@ -879,6 +848,11 @@
         </div>
     </div>
 
+    <div class="update-banner" id="updateBanner">
+        <span>新しいバージョンが利用可能です</span>
+        <button class="update-button" onclick="updateApp()">更新</button>
+    </div>
+
     <div class="symbol-dialog" id="symbolDialog">
         <div class="symbol-content">
             <div class="symbol-header">
@@ -946,6 +920,8 @@
         let animationId;
         let diceObjects = [];
         let diceResults = [];
+        let updateAvailable = false;
+        let deferredPrompt;
 
         const geomancySymbols = {
             '2222': { name: 'Populus（人々）', meaning: '物事や人が多数ある状態。受け身。安定。', symbol: '••\n••\n••\n••', yesno: 'イエス', fortune: '吉' },
@@ -1636,9 +1612,106 @@
             }
             // 初期表示時も最上部に
             window.scrollTo(0, 0);
+            
+            // Service Worker更新チェック
+            checkForServiceWorkerUpdate();
+            
+            // 定期的な更新チェック（5分毎）
+            setInterval(checkForServiceWorkerUpdate, 5 * 60 * 1000);
         });
 
         document.addEventListener('touchstart', function() {}, {passive: true});
+
+        // Service Worker更新関連の関数
+        function checkForServiceWorkerUpdate() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistration()
+                    .then(registration => {
+                        if (registration) {
+                            registration.update();
+                            
+                            registration.addEventListener('updatefound', () => {
+                                const newWorker = registration.installing;
+                                newWorker.addEventListener('statechange', () => {
+                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        updateAvailable = true;
+                                        showUpdateBanner();
+                                        
+                                        // GA4 イベント送信
+                                        gtag('event', 'app_update_available', {
+                                            'event_category': 'app_lifecycle',
+                                            'event_label': 'update_detected'
+                                        });
+                                    }
+                                });
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration check failed:', error);
+                    });
+            }
+        }
+
+        function showUpdateBanner() {
+            const banner = document.getElementById('updateBanner');
+            if (banner && !banner.classList.contains('show')) {
+                banner.classList.add('show');
+                
+                // 10秒後に自動で非表示
+                setTimeout(() => {
+                    if (banner.classList.contains('show')) {
+                        hideUpdateBanner();
+                    }
+                }, 10000);
+            }
+        }
+
+        function hideUpdateBanner() {
+            const banner = document.getElementById('updateBanner');
+            if (banner) {
+                banner.classList.remove('show');
+            }
+        }
+
+        function updateApp() {
+            if (updateAvailable) {
+                // GA4 イベント送信
+                gtag('event', 'app_update_clicked', {
+                    'event_category': 'app_lifecycle',
+                    'event_label': 'manual_update'
+                });
+                
+                hideUpdateBanner();
+                
+                // Service Worker更新処理
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistration()
+                        .then(registration => {
+                            if (registration && registration.waiting) {
+                                // 新しいService Workerに切り替え
+                                registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                                
+                                // ページリロード
+                                window.location.reload();
+                            }
+                        });
+                } else {
+                    // Service Worker非対応の場合は単純にリロード
+                    window.location.reload();
+                }
+            }
+        }
+
+        // Service Workerからのメッセージを受信
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', event => {
+                if (event.data && event.data.type === 'SW_UPDATED') {
+                    // Service Workerが更新された時の処理
+                    window.location.reload();
+                }
+            });
+        }
     </script>
 </body>
 </html>
