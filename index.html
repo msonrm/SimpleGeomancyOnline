@@ -1648,6 +1648,19 @@
             
             // 定期的な更新チェック（5分毎）
             setInterval(checkForServiceWorkerUpdate, 5 * 60 * 1000);
+            
+            // ページがアクティブになった時の更新チェック
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    // ページがアクティブになった時にチェック
+                    checkForServiceWorkerUpdate();
+                }
+            });
+            
+            // ウィンドウがフォーカスされた時の更新チェック
+            window.addEventListener('focus', () => {
+                checkForServiceWorkerUpdate();
+            });
         });
 
         document.addEventListener('touchstart', function() {}, {passive: true});
