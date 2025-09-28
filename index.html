@@ -923,6 +923,7 @@
         let diceResults = [];
         let updateAvailable = false;
         let deferredPrompt;
+        let clock = null;
 
         const geomancySymbols = {
             '2222': { name: 'Populus（人々）', meaning: '物事や人が多数ある状態。受け身。安定。', symbol: '••\n••\n••\n••', yesno: 'イエス', fortune: '吉' },
@@ -1037,12 +1038,26 @@
         function addDot(zoneIndex, x, y) {
             if (isGenerating) return;
             if (x < 0 || x > 100 || y < 0 || y > 100) return;
-            zoneDots[zoneIndex].push({ x, y });
+            
+            // バッファゾーンでの位置調整
+            const bufferSize = 8; // バッファゾーンのサイズ（%）
+            let adjustedY = y;
+            
+            // 上境界近く（各ゾーンの上端）
+            if (y < bufferSize && zoneIndex > 0) {
+                adjustedY = bufferSize + 2; // 明確に現在のゾーン内に配置
+            }
+            // 下境界近く（各ゾーンの下端）
+            else if (y > (100 - bufferSize) && zoneIndex < 3) {
+                adjustedY = 100 - bufferSize - 2; // 明確に現在のゾーン内に配置
+            }
+            
+            zoneDots[zoneIndex].push({ x, y: adjustedY });
             const zoneElement = document.getElementById(`zone-${zoneIndex}`);
             const dot = document.createElement('div');
             dot.className = 'dot';
             dot.style.left = `${x}%`;
-            dot.style.top = `${y}%`;
+            dot.style.top = `${adjustedY}%`;
             zoneElement.appendChild(dot);
             const canvas = document.getElementById(`canvas-${zoneIndex}`);
             canvas.width = canvas.offsetWidth;
@@ -1266,6 +1281,10 @@
                 world.addContactMaterial(floorDiceContact);
                 createFloor();
                 createWalls();
+                
+                // Three.js Clockを初期化
+                clock = new THREE.Clock();
+                
                 animate3D();
             } catch (error) {
                 console.error('3Dシーン初期化エラー:', error);
@@ -1318,7 +1337,16 @@
 
         function animate3D() {
             animationId = requestAnimationFrame(animate3D);
-            if (world) world.step(1/60);
+            
+            if (world && clock) {
+                const deltaTime = clock.getDelta();
+                const fixedTimeStep = 1/60;
+                const maxSubSteps = 3;
+                
+                // デルタタイムベースの物理演算
+                world.step(fixedTimeStep, deltaTime, maxSubSteps);
+            }
+            
             animateIdleDice();
             diceObjects.forEach((dice) => {
                 if (dice.body && dice.mesh && !dice.idleRotation) {
