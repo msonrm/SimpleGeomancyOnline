@@ -1,4 +1,4 @@
-const CACHE_NAME = 'geomancy-v27';
+const CACHE_NAME = 'geomancy-v28';
 const urlsToCache = [
   './',
   './index.html',
