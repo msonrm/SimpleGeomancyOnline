@@ -1293,6 +1293,31 @@
         }
 
         function createFloor() {
+            const container = document.getElementById('dice-3d-container');
+            const containerWidth = container.clientWidth;
+            const containerHeight = container.clientHeight;
+            
+            // コンテナのアスペクト比に基づいて床サイズを計算
+            // カメラの視野(-10, 10)に合わせてスケーリング
+            const cameraWidth = 20; // -10 to 10
+            const cameraHeight = 20; // -10 to 10
+            
+            // コンテナの実際のサイズに合わせて床サイズを調整
+            let floorWidth, floorHeight;
+            if (containerWidth > containerHeight) {
+                // 横長の場合
+                floorHeight = cameraHeight;
+                floorWidth = (containerWidth / containerHeight) * cameraHeight;
+            } else {
+                // 縦長または正方形の場合
+                floorWidth = cameraWidth;
+                floorHeight = (containerHeight / containerWidth) * cameraWidth;
+            }
+            
+            // 最小・最大サイズの制限
+            floorWidth = Math.min(Math.max(floorWidth, 16), 40);
+            floorHeight = Math.min(Math.max(floorHeight, 16), 40);
+            
             const floorMaterial = new CANNON.Material('floor');
             const floorShape = new CANNON.Plane();
             const floorBody = new CANNON.Body({ mass: 0, material: floorMaterial });
@@ -1300,7 +1325,7 @@
             floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
             floorBody.position.set(0, -6, 0);
             world.add(floorBody);
-            const floorGeometry = new THREE.PlaneGeometry(20, 20);
+            const floorGeometry = new THREE.PlaneGeometry(floorWidth, floorHeight);
             const floorMaterialThree = new THREE.MeshLambertMaterial({ color: 0xe8dcc6, transparent: true, opacity: 0.8 });
             const floorMesh = new THREE.Mesh(floorGeometry, floorMaterialThree);
             floorMesh.rotation.x = -Math.PI / 2;
@@ -1310,22 +1335,44 @@
         }
 
         function createWalls() {
+            const container = document.getElementById('dice-3d-container');
+            const containerWidth = container.clientWidth;
+            const containerHeight = container.clientHeight;
+            
+            // 床サイズと全く同じ計算で壁配置を決定
+            const cameraWidth = 20;
+            const cameraHeight = 20;
+            
+            let wallDistanceX, wallDistanceZ;
+            if (containerWidth > containerHeight) {
+                wallDistanceZ = cameraHeight / 2; // 床の端と同じ位置
+                wallDistanceX = ((containerWidth / containerHeight) * cameraHeight) / 2;
+            } else {
+                wallDistanceX = cameraWidth / 2;
+                wallDistanceZ = ((containerHeight / containerWidth) * cameraWidth) / 2;
+            }
+            
+            // 床と同じ最小・最大の制限
+            const floorWidth = Math.min(Math.max(wallDistanceX * 2, 16), 40);
+            const floorHeight = Math.min(Math.max(wallDistanceZ * 2, 16), 40);
+            wallDistanceX = floorWidth / 2;
+            wallDistanceZ = floorHeight / 2;
+            
             const wallHeight = 12;
-            const roomSize = 12;
             const wallPositions = [
-                { x: roomSize, y: wallHeight/2 - 6, z: 0, rotY: 0 },
-                { x: -roomSize, y: wallHeight/2 - 6, z: 0, rotY: 0 },
-                { x: 0, y: wallHeight/2 - 6, z: roomSize, rotY: Math.PI/2 },
-                { x: 0, y: wallHeight/2 - 6, z: -roomSize, rotY: Math.PI/2 }
+                { x: wallDistanceX, y: wallHeight/2 - 6, z: 0, rotY: 0 },
+                { x: -wallDistanceX, y: wallHeight/2 - 6, z: 0, rotY: 0 },
+                { x: 0, y: wallHeight/2 - 6, z: wallDistanceZ, rotY: Math.PI/2 },
+                { x: 0, y: wallHeight/2 - 6, z: -wallDistanceZ, rotY: Math.PI/2 }
             ];
             wallPositions.forEach((pos) => {
-                const wallShape = new CANNON.Box(new CANNON.Vec3(0.5, wallHeight/2, roomSize));
+                const wallShape = new CANNON.Box(new CANNON.Vec3(0.5, wallHeight/2, Math.max(wallDistanceX, wallDistanceZ)));
                 const wallBody = new CANNON.Body({ mass: 0 });
                 wallBody.addShape(wallShape);
                 wallBody.position.set(pos.x, pos.y, pos.z);
                 if (pos.rotY) wallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), pos.rotY);
                 world.add(wallBody);
-                const wallGeometry = new THREE.BoxGeometry(1, wallHeight, roomSize * 2);
+                const wallGeometry = new THREE.BoxGeometry(1, wallHeight, Math.max(wallDistanceX, wallDistanceZ) * 2);
                 const wallMaterialThree = new THREE.MeshLambertMaterial({ color: 0xd4c4a8, transparent: true, opacity: 0, visible: false });
                 const wallMesh = new THREE.Mesh(wallGeometry, wallMaterialThree);
                 wallMesh.position.set(pos.x, pos.y, pos.z);
