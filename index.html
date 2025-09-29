@@ -1684,6 +1684,19 @@
             // 初期表示時も最上部に
             window.scrollTo(0, 0);
             
+            // Service Worker登録
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./service-worker.js')
+                        .then(registration => {
+                            console.log('ServiceWorker registered:', registration);
+                        })
+                        .catch(err => {
+                            console.log('ServiceWorker registration failed:', err);
+                        });
+                });
+            }
+            
             // Service Worker更新チェック
             checkForServiceWorkerUpdate();
             
