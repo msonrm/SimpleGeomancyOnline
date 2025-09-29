@@ -922,7 +922,7 @@
             
             <div class="symbol-expand-section">
                 <div class="symbol-expand-toggle" onclick="toggleSymbolDetails()">
-                    <span id="expand-text">占いの記録を残しましょう</span>
+                    <span id="expand-text">占いの結果を残しましょう</span>
                     <span id="expand-arrow">▼</span>
                 </div>
                 <div class="symbol-expand-content" id="symbol-expand-content">
@@ -1212,7 +1212,7 @@
             if (content.classList.contains('open')) {
                 content.classList.remove('open');
                 arrow.classList.remove('rotated');
-                text.textContent = '保存するには';
+                text.textContent = '占いの結果を残しましょう';
             } else {
                 // GA4 イベント送信 - 詳細を見る
                 gtag('event', 'symbol_details_expanded', {
@@ -1725,37 +1725,34 @@
             // 初期表示時も最上部に
             window.scrollTo(0, 0);
             
-            // Service Worker登録
+            // Service Worker登録と更新チェックの初期化
             if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('./service-worker.js')
-                        .then(registration => {
-                            console.log('ServiceWorker registered:', registration);
-                        })
-                        .catch(err => {
-                            console.log('ServiceWorker registration failed:', err);
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registered:', registration);
+                        
+                        // 登録完了後に更新チェック開始
+                        checkForServiceWorkerUpdate();
+                        
+                        // 定期的な更新チェック（5分毎）
+                        setInterval(checkForServiceWorkerUpdate, 5 * 60 * 1000);
+                        
+                        // ページがアクティブになった時の更新チェック
+                        document.addEventListener('visibilitychange', () => {
+                            if (!document.hidden) {
+                                checkForServiceWorkerUpdate();
+                            }
                         });
-                });
+                        
+                        // ウィンドウがフォーカスされた時の更新チェック
+                        window.addEventListener('focus', () => {
+                            checkForServiceWorkerUpdate();
+                        });
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed:', err);
+                    });
             }
-            
-            // Service Worker更新チェック
-            checkForServiceWorkerUpdate();
-            
-            // 定期的な更新チェック（5分毎）
-            setInterval(checkForServiceWorkerUpdate, 5 * 60 * 1000);
-            
-            // ページがアクティブになった時の更新チェック
-            document.addEventListener('visibilitychange', () => {
-                if (!document.hidden) {
-                    // ページがアクティブになった時にチェック
-                    checkForServiceWorkerUpdate();
-                }
-            });
-            
-            // ウィンドウがフォーカスされた時の更新チェック
-            window.addEventListener('focus', () => {
-                checkForServiceWorkerUpdate();
-            });
         });
 
         document.addEventListener('touchstart', function() {}, {passive: true});
