@@ -249,6 +249,29 @@
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
+        .update-banner-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .update-banner-header {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .update-banner-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .update-banner-text {
+            flex: 1;
+            text-align: left;
+        }
+
         .update-banner.show {
             display: block;
             opacity: 1;
@@ -274,13 +297,24 @@
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            margin-left: 12px;
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
 
         .update-button:hover {
             transform: scale(1.05);
             background: #f5f0e8;
+        }
+
+        .update-button.close {
+            background: transparent;
+            color: white;
+            font-size: 20px;
+            padding: 4px 8px;
+        }
+
+        .update-button.close:hover {
+            background: rgba(255,255,255,0.1);
         }
 
         .screen {
@@ -851,9 +885,15 @@
     </div>
 
     <div class="update-banner" id="updateBanner">
-        <span>新しいバージョンが利用可能です</span>
-        <button class="update-button" onclick="updateApp()">更新</button>
-        <button class="update-button" onclick="hideUpdateBanner()" style="background: transparent; color: white; margin-left: 16px;">×</button>
+        <div class="update-banner-content">
+            <div class="update-banner-header">
+                <button class="update-button close" onclick="hideUpdateBanner()">×</button>
+            </div>
+            <div class="update-banner-main">
+                <span class="update-banner-text">新しいバージョンが利用可能です</span>
+                <button class="update-button" onclick="updateApp()">更新</button>
+            </div>
+        </div>
     </div>
 
     <div class="symbol-dialog" id="symbolDialog">
@@ -887,8 +927,8 @@
                 </div>
                 <div class="symbol-expand-content" id="symbol-expand-content">
                     <div class="symbol-expand-text">
-                       <strong>占いの記録を残すことで、自分のパターンや変化に気づけます。</strong><br>
-                       スマートフォンアプリ「<a href="#" onclick="gtag('event', 'app_promotion_click', {'source': 'symbol_details', 'event_category': 'app_promotion', 'event_label': 'geomancy_diary_from_symbol'}); closeSymbolDialog(); showHome(); scrollToAppSection();">Geomancy Diary</a>」なら、「仕事の悩み」「恋愛相談」など、何を占ったのか・結果はどうだったのかを記録できます。あとで振り返って、占いの結果と実際のできごとを照らし合わせることができます。
+                       <strong>占いの記録を残しましょう。</strong><br><br>
+                       スマートフォンアプリ「<a href="#" onclick="gtag('event', 'app_promotion_click', {'source': 'symbol_details', 'event_category': 'app_promotion', 'event_label': 'geomancy_diary_from_symbol'}); closeSymbolDialog(); showHome(); scrollToAppSection();">Geomancy Diary</a>」では、「仕事の悩み」「恋愛の相談」など、何を占ったのか・結果はどうだったのかを記録できます。あとから振り返ることで、占いの結果と実際のできごとを照らし合わせましょう。
                     </div>
                 </div>
             </div>
@@ -1173,7 +1213,7 @@
             if (content.classList.contains('open')) {
                 content.classList.remove('open');
                 arrow.classList.remove('rotated');
-                text.textContent = '保存したい';
+                text.textContent = '保存するには';
             } else {
                 // GA4 イベント送信 - 詳細を見る
                 gtag('event', 'symbol_details_expanded', {
